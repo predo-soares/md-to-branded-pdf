@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "language": "en",
+  "identity": {
+    "name": "Sample Person",
+    "headline": "Software Engineer | Product & Technology",
+    "contacts": [
+      { "text": "City, Country" },
+      { "text": "person@example.com" },
+      { "text": "Portfolio", "href": "https://example.com" }
+    ]
+  },
+  "summary": "Technology professional with experience building digital products.",
+  "experience": [
+    {
+      "kind": "role",
+      "company": "Example Company",
+      "role": "Software Engineer",
+      "datesLocation": "2024 – 2026 · City, Country",
+      "description": "Example company used to demonstrate the content format.",
+      "bullets": ["Built product features in collaboration with a cross-functional team."]
+    },
+    {
+      "kind": "group",
+      "title": "Earlier Experience",
+      "bullets": ["**Sample Organization — Analyst:** Contributed to a cross-functional project."]
+    }
+  ],
+  "education": ["**Example University — B.S. in Technology** · 2020 – 2024"],
+  "languages": ["Portuguese · English"],
+  "skills": ["**Technologies:** TypeScript · React"]
+}

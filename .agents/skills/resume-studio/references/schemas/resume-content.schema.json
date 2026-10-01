@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://resume-studio.local/schemas/resume-content.schema.json",
+  "title": "Resume Studio content",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "language", "identity", "summary", "experience", "education", "languages", "skills"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "language": { "enum": ["pt-BR", "en"] },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "headline", "contacts"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "headline": { "type": "string", "minLength": 1 },
+        "contacts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["text"],
+            "properties": {
+              "text": { "type": "string", "minLength": 1 },
+              "href": { "type": "string", "format": "uri" }
+            }
+          }
+        }
+      }
+    },
+    "summary": { "type": "string", "minLength": 1 },
+    "experience": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind", "company", "role", "datesLocation", "bullets"],
+            "properties": {
+              "kind": { "const": "role" },
+              "company": { "type": "string", "minLength": 1 },
+              "role": { "type": "string", "minLength": 1 },
+              "datesLocation": { "type": "string", "minLength": 1 },
+              "description": { "type": "string" },
+              "bullets": { "$ref": "#/$defs/textList", "minItems": 1 }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind", "title", "bullets"],
+            "properties": {
+              "kind": { "const": "group" },
+              "title": { "type": "string", "minLength": 1 },
+              "bullets": { "$ref": "#/$defs/textList", "minItems": 1 }
+            }
+          }
+        ]
+      }
+    },
+    "education": { "$ref": "#/$defs/textList" },
+    "languages": { "$ref": "#/$defs/textList" },
+    "skills": { "$ref": "#/$defs/textList" }
+  },
+  "$defs": {
+    "textList": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    }
+  }
+}

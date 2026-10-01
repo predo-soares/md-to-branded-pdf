@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{TITLE}}</title>
+  <style>
+    @page { size: A4; margin: 18mm 20mm; }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: #1c1c1c; background: #f3f3f1; font: 11pt/1.45 Arial, Helvetica, sans-serif; }
+    main { width: 210mm; min-height: 297mm; margin: 18px auto; padding: 18mm 20mm; background: white; }
+    header { padding-bottom: 12pt; border-bottom: 1px solid #242424; }
+    h1 { margin: 0; font-size: 24pt; line-height: 1.1; }
+    .contact, .date, .recipient, .subject { font-size: 9.5pt; color: #444; }
+    .contact { margin: 5pt 0 0; }
+    .date { margin: 16pt 0; text-align: right; }
+    .recipient { margin: 0 0 14pt; }
+    .subject { margin: 0 0 14pt; font-weight: 700; color: #1c1c1c; }
+    p { margin: 0 0 9pt; }
+    .salutation { margin-bottom: 12pt; }
+    .closing { margin-top: 14pt; }
+    .signature { margin-top: 10pt; font-weight: 700; }
+    @media print {
+      body { background: white; }
+      main { width: 100%; min-height: 0; margin: 0; padding: 0; }
+    }
+    @media screen and (max-width: 760px) {
+      main { width: 100%; min-height: 100vh; margin: 0; padding: 32px 24px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>{{NAME}}</h1>
+      <p class="contact">{{CONTACT}}</p>
+    </header>
+    <p class="date">{{DATE}}</p>
+    <div class="recipient">{{RECIPIENT}}</div>
+    <p class="subject">{{SUBJECT}}</p>
+    <p class="salutation">{{SALUTATION}}</p>
+    <section class="body">{{BODY}}</section>
+    <div class="closing"><p>{{SIGNOFF}}</p><p class="signature">{{NAME}}</p></div>
+  </main>
+</body>
+</html>

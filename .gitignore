@@ -1,0 +1,30 @@
+# Personal résumé sources and vacancy-specific application material
+/*Master Resume.md
+/*Curriculo Mestre.md
+/resumes/targeted/
+/.firecrawl/
+
+# Generated documents, previews, and local experiments (may contain personal data)
+/output/
+/docs/experiments/
+*.pdf
+
+# Locally installed reference skill; do not redistribute it with this repository
+/.agents/skills/kami/
+
+# Local environments, dependency trees, caches, and operating-system files
+**/node_modules/
+**/.venv/
+**/venv/
+**/__pycache__/
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+.DS_Store
+
+# Local secrets and environment configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key

@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "language": "pt-BR",
+  "identity": {
+    "name": "Pessoa Exemplo",
+    "headline": "Engenheira de Software | Produto e Tecnologia",
+    "contacts": [
+      { "text": "Cidade, País" },
+      { "text": "pessoa@example.com" },
+      { "text": "Portfólio", "href": "https://example.com" }
+    ]
+  },
+  "summary": "Profissional de tecnologia com experiência na construção de produtos digitais.",
+  "experience": [
+    {
+      "kind": "role",
+      "company": "Empresa Exemplo",
+      "role": "Engenheira de Software",
+      "datesLocation": "2024 – 2026 · Cidade, País",
+      "description": "Empresa de exemplo para ilustrar o formato dos dados.",
+      "bullets": ["Desenvolveu funcionalidades de produto em colaboração com a equipe."]
+    },
+    {
+      "kind": "group",
+      "title": "Experiência Anterior",
+      "bullets": ["**Organização Exemplo — Analista:** Contribuiu para um projeto multidisciplinar."]
+    }
+  ],
+  "education": ["**Universidade Exemplo — Graduação em Tecnologia** · 2020–2024"],
+  "languages": ["Português · Inglês"],
+  "skills": ["**Tecnologias:** TypeScript · React"]
+}

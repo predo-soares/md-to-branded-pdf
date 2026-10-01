@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="{{LANG}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="author" content="{{AUTHOR}}">
+<title>{{TITLE}}</title>
+<style>
+@page { size: A4; margin: 18mm 12mm 16mm; }
+* { box-sizing: border-box; }
+body { margin: 0; background: #f8fafc; color: #262626; font: 9.5pt/1.31 Arial, Helvetica, sans-serif; }
+.page { width: 210mm; min-height: 297mm; margin: 18px auto; padding: 18mm 12mm 16mm; background: #fff; }
+h1, h2, h3, p { margin: 0; }
+strong { font-weight: 400; }
+.identity { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; padding-bottom: 7pt; border-bottom: .6pt solid #d9d9d9; }
+.identity h1 { flex: 0 0 auto; font-size: 25pt; font-weight: 400; line-height: 1.05; white-space: nowrap; }
+.identity-details { flex: 1; min-width: 0; text-align: right; }
+.headline { color: #3a3a3a; font-size: 12pt; font-weight: 400; line-height: 1.2; }
+.contact { margin-top: 2mm; color: #8b8b8b; font-size: 7.6pt; line-height: 1.2; overflow-wrap: normal; }
+h2 { font-size: 11pt; line-height: 1.2; font-weight: 400; text-transform: uppercase; margin: 16pt 0 6pt; }
+.summary-section h2 { margin-top: 7pt; margin-bottom: 5pt; }
+.summary { color: #3a3a3a; font-size: 9.5pt; line-height: 1.31; }
+.experience-section h2 { margin-top: 7pt; margin-bottom: 5pt; }
+.job { margin: 0 0 9pt; break-inside: avoid; }
+.head { display: flex; align-items: baseline; justify-content: space-between; gap: 6pt; }
+.head h3 { flex: 0 0 auto; font-size: 9.5pt; line-height: 1.2; font-weight: 400; white-space: nowrap; }
+.head .meta { flex: 0 0 auto; color: #8b8b8b; font-size: 7.7pt; line-height: 1.2; white-space: nowrap; text-align: right; }
+.company-description { color: #8b8b8b; font-size: 8.8pt; line-height: 1.25; margin-top: 1pt; }
+.job ul { margin: 5pt 0 0; padding-left: 11pt; }
+.job li { margin: 0 0 1.5pt; padding-left: 0; font-size: 9pt; line-height: 1.36; }
+.earlier-experience { break-before: page; page-break-before: always; }
+.earlier-experience h3 { font-size: 11pt; font-weight: 400; text-transform: uppercase; margin-bottom: 6pt; }
+.earlier-experience ul { margin-top: 0; }
+.skills p { margin: 0 0 2pt; }
+a { color: inherit; text-decoration: none; }
+@media print { body { background: #fff; } .page { width: auto; min-height: 0; margin: 0; padding: 0; } }
+@media screen and (max-width: 760px) { .page { width: 100%; min-height: 100vh; margin: 0; padding: 28px 24px; } .identity { display: block; } .identity-details { text-align: left; margin-top: 10px; } .head { display: block; } .head h3 { white-space: normal; } }
+</style>
+</head>
+<body>
+{{BODY}}
+</body>
+</html>
