@@ -8,6 +8,7 @@ from pathlib import Path
 from markdown_it import MarkdownIt
 
 from charts import replace_chart_fences
+from deck_content import split_slides
 from diagrams import replace_diagram_fences
 from media_validation import guarded_fetcher, validate_and_rewrite
 from render_html_pdf import _load_weasyprint
@@ -15,23 +16,6 @@ from render_html_pdf import _load_weasyprint
 
 CSS = Path(__file__).resolve().parents[1] / "assets/deck.css"
 GEIST = Path(__file__).resolve().parents[1] / "assets/geist-latin.woff2"
-
-
-def split_slides(markdown: str) -> list[str]:
-    parser = MarkdownIt("commonmark", {"html": False})
-    lines = markdown.splitlines(keepends=True)
-    boundaries = [token.map for token in parser.parse(markdown)
-                  if token.type == "hr" and token.level == 0 and
-                  "".join(lines[token.map[0]:token.map[1]]).strip() == "---"]
-    slides = []
-    start = 0
-    for first, last in boundaries:
-        slides.append("".join(lines[start:first]).strip())
-        start = last
-    slides.append("".join(lines[start:]).strip())
-    if any(not slide for slide in slides):
-        raise ValueError("Pitch deck has an empty slide around a --- separator")
-    return slides
 
 
 def validate_structured_slide(tokens: list, layout: str, number: int) -> None:

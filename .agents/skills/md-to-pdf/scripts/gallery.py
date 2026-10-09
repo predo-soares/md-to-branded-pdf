@@ -54,6 +54,7 @@ def generate(output: Path) -> dict:
                               "height_pt": expected_size[1]},
                  "files": {"html": str(html_path.relative_to(output)),
                            "pdf": str(pdf_path.relative_to(output)),
+                           "content_json": str(html_path.with_suffix(".content.json").relative_to(output)),
                            "review": str(review_path.relative_to(output))},
                  "status": "pending"}
         entries.append(entry)
@@ -97,7 +98,7 @@ def generate(output: Path) -> dict:
         lines.append("")
         if entry["status"] == "generated_for_human_review":
             files = entry["files"]
-            lines.append(f"[HTML]({files['html']}) · [PDF]({files['pdf']}) · "
+            lines.append(f"[Content JSON]({files['content_json']}) · [HTML]({files['html']}) · [PDF]({files['pdf']}) · "
                          f"[Verification]({files['verification']}) · [Checklist]({files['checklist']})")
             lines.append("")
             lines.extend(f"![{entry['template']} page {index}]({image})" for index, image in

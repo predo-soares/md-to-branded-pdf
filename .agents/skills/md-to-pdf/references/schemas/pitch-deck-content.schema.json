@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object", "required": ["slides"], "additionalProperties": false,
+  "properties": {
+    "slides": {"type": "array", "minItems": 2, "items": {
+      "type": "object", "required": ["layout", "title", "markdown"], "additionalProperties": false,
+      "properties": {
+        "layout": {"enum": ["cover", "assertion", "comparison", "metrics", "closing"]},
+        "title": {"type": "string", "minLength": 1},
+        "markdown": {"type": "string", "minLength": 1}
+      }
+    }}
+  }
+}

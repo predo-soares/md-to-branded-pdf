@@ -49,7 +49,7 @@ class DiagramTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             source = root / "invalid.md"
-            source.write_text("# Invalid\n\n```diagram\n"
+            source.write_text("# Invalid\n\n## Example\n\n```diagram\n"
                               '{"type":"flowchart","title":"Bad","nodes":[{"id":"a","label":"A"},{"id":"b","label":"B"}],"edges":[{"from":"a","to":"missing"}]}\n'
                               "```\n")
             result = self.build(source, root, "long-document")

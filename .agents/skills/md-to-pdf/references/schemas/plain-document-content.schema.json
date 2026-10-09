@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object", "required": ["title", "markdown"], "additionalProperties": false,
+  "properties": {
+    "title": {"type": "string", "minLength": 1},
+    "markdown": {"type": "string", "minLength": 1}
+  }
+}

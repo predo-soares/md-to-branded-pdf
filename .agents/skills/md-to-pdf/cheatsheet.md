@@ -34,6 +34,7 @@ paper: '#ffffff'
 ```
 
 If both sources name a Template, they must agree. If the intended document type is unclear, ask the user to choose before running the command. The output paths must differ from the Markdown source and from each other. Generated files belong in an ignored local output directory.
+Each successful build also saves a validated `.content.json` beside its HTML. The Markdown remains the file to edit; see `references/schemas/README.md` for the ten Template contracts.
 
 The first interactive build offers default Geist styling or customization. Choose `system-ui`, a local `.ttf`, `.otf`, `.woff`, or `.woff2` file, or another supported family, plus hex accent and paper colors. The choice is reused globally; `--font`, `--accent`, and `--paper` override it for one eligible build. A relative CLI font path starts at the working directory; a relative frontmatter font path starts at the Markdown file. Non-interactive builds without a saved profile use Geist defaults.
 

@@ -13,6 +13,7 @@ import yaml
 from google_fonts import resolve as resolve_google_font
 from fontsource_fonts import resolve as resolve_fontsource_font
 from style_profile import DEFAULT, FONTS, load as load_profile, onboard, validate as validate_profile
+from template_content import parse as parse_content
 
 SCRIPTS = Path(__file__).resolve().parent
 TEMPLATES = {"plain-document": "build-document.py", "proposal": "build-proposal.py",
@@ -151,23 +152,14 @@ def main() -> None:
                    {"css_path": PORTFOLIO_CSS, "figure_images": True} if template == "portfolio" else
                    {"css_path": REPORT_CSS, "figure_images": True} if template == "analytical-report" else
                    {"css_path": CHANGELOG_CSS} if template == "changelog" else {})
-        if template == "portfolio":
-            from portfolio_content import parse as parse_portfolio
-            content = parse_portfolio(markdown)
-        elif template == "analytical-report":
-            from report_content import parse as parse_report
-            content = parse_report(markdown)
-        elif template == "changelog":
-            from changelog_content import parse as parse_changelog
-            content = parse_changelog(markdown)
+        content = parse_content(template, markdown, source.stem)
         load_builder(template)(source, html_output, pdf_output, markdown=markdown,
                                title_override=metadata.get("title"), language=language,
                                style_profile=style_profile, style_override=style_override,
                                verified_image_hosts=hosts, **options)
-        if template in {"portfolio", "analytical-report", "changelog"}:
-            json_output = html_output.with_suffix(".content.json")
-            json_output.write_text(json.dumps(content, ensure_ascii=False, indent=2) + "\n",
-                                   encoding="utf-8")
+        json_output = html_output.with_suffix(".content.json")
+        json_output.write_text(json.dumps(content, ensure_ascii=False, indent=2) + "\n",
+                               encoding="utf-8")
     except (ValueError, OSError) as error:
         parser.error(str(error))
 

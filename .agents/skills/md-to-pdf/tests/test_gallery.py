@@ -29,6 +29,7 @@ class GalleryTests(unittest.TestCase):
                 self.assertEqual(entry["status"], "generated_for_human_review")
                 self.assertEqual(entry["expected"], entry["observed"])
                 for path in (entry["files"]["html"], entry["files"]["pdf"],
+                             entry["files"]["content_json"],
                              entry["files"]["verification"], entry["files"]["checklist"],
                              *entry["files"]["page_images"]):
                     self.assertTrue((output / path).is_file(), path)
