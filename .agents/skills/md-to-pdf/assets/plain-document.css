@@ -19,4 +19,4 @@ th, td { border-bottom: 1px solid var(--rule); padding: 5pt; text-align: left; v
 tr, img, pre { break-inside: avoid; }
 pre { white-space: pre-wrap; overflow-wrap: anywhere; padding: 8pt; background: var(--code-background); }
 img { max-width: 100%; }
-a { color: inherit; }
+a { color: var(--accent, var(--ink)); }

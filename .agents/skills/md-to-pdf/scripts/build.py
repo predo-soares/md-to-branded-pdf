@@ -5,9 +5,11 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import re
+import sys
 from pathlib import Path
 
 import yaml
+from style_profile import DEFAULT, load as load_profile, onboard, validate as validate_profile
 
 SCRIPTS = Path(__file__).resolve().parent
 TEMPLATES = {"plain-document": "build-document.py"}
@@ -34,7 +36,7 @@ def read_source(source: Path) -> tuple[str, dict[str, str]]:
     frontmatter = yaml.safe_load("".join(lines[1:closing])) or {}
     if not isinstance(frontmatter, dict):
         raise ValueError("YAML frontmatter must be a mapping")
-    allowed = {"template", "lang", "title"}
+    allowed = {"template", "lang", "title", "font", "accent", "paper"}
     unknown = set(frontmatter) - allowed
     if unknown:
         raise ValueError(f"Unsupported frontmatter fields: {', '.join(sorted(map(str, unknown)))}")
@@ -47,6 +49,9 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("markdown", type=Path, help="Markdown source file")
     parser.add_argument("--template", choices=sorted(TEMPLATES))
+    parser.add_argument("--font", help="Document font; overrides global profile")
+    parser.add_argument("--accent", help="Document accent color (#RRGGBB)")
+    parser.add_argument("--paper", help="Document paper color (#RRGGBB)")
     parser.add_argument("--html", required=True, type=Path, help="Saved HTML output")
     parser.add_argument("--pdf", required=True, type=Path, help="PDF output")
     args = parser.parse_args()
@@ -73,8 +78,20 @@ def main() -> None:
     language = metadata.get("lang", "en")
     if not re.fullmatch(r"[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*", language):
         parser.error(f"Invalid document language: {language}")
+    try:
+        style_profile = load_profile()
+        if style_profile is None:
+            style_profile = onboard() if sys.stdin.isatty() else DEFAULT.copy()
+        style_profile.update({key: metadata[key] for key in ("font", "accent", "paper") if key in metadata})
+        style_profile.update({key: value for key, value in
+                              (("font", args.font), ("accent", args.accent), ("paper", args.paper))
+                              if value is not None})
+        validate_profile(style_profile)
+    except (ValueError, OSError) as error:
+        parser.error(str(error))
     load_builder(template)(source, html_output, pdf_output, markdown=markdown,
-                           title_override=metadata.get("title"), language=language)
+                           title_override=metadata.get("title"), language=language,
+                           style_profile=style_profile)
 
 
 if __name__ == "__main__":

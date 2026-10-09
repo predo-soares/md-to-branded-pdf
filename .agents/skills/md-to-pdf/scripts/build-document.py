@@ -12,16 +12,24 @@ from render_html_pdf import _load_weasyprint
 
 
 CSS = Path(__file__).resolve().parents[1] / "assets/plain-document.css"
+GEIST = Path(__file__).resolve().parents[1] / "assets/geist-latin.woff2"
 
 
 def build(source: Path, html_output: Path, pdf_output: Path, *, markdown: str | None = None,
-          title_override: str | None = None, language: str = "en") -> None:
+          title_override: str | None = None, language: str = "en",
+          style_profile: dict[str, str] | None = None) -> None:
     markdown = markdown if markdown is not None else source.read_text(encoding="utf-8")
     if not markdown.strip():
         raise ValueError("Markdown source is empty")
     title = title_override or next((line[2:].strip() for line in markdown.splitlines() if line.startswith("# ")), source.stem)
     body = MarkdownIt("commonmark", {"breaks": True}).enable("table").render(markdown)
     styles = CSS.read_text(encoding="utf-8")
+    if style_profile:
+        font = style_profile["font"]
+        if font == "Geist":
+            styles += f'\n@font-face {{ font-family: "Geist"; src: url("{GEIST.as_uri()}") format("woff2"); }}'
+        styles += (f'\n:root {{ --font-body: "{font}", sans-serif; '
+                   f'--accent: {style_profile["accent"]}; --paper: {style_profile["paper"]}; }}')
     document = f'''<!doctype html>
 <html lang="{html.escape(language, quote=True)}"><head><meta charset="utf-8"><title>{html.escape(title)}</title>
 <style>{styles}</style></head><body>{body}</body></html>'''

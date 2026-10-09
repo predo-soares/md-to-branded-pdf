@@ -20,6 +20,8 @@ The proposal renderer requires at least one `##` section and supports `--kind`, 
 
 The unified `scripts/build.py` command currently supports `plain-document`; other existing renderers will join it as their Templates are migrated. Direct builds require `--template` or YAML frontmatter `template`. Matching declarations are accepted; conflicting or unknown selections fail. Use `cheatsheet.md` for user-facing usage and `design.md` for style rules. `assets/plain-document.css` contains the executable plain-document defaults.
 
+On first interactive build, offer default or custom style choices; the choice is saved to `~/.config/md-to-pdf/profile.json` (or `$XDG_CONFIG_HOME/md-to-pdf/profile.json`). Non-interactive builds without a saved profile use defaults and do not write a profile. The current font choices are system UI and bundled Geist; user-supplied local fonts and remote providers are separate upcoming capabilities. Per-document `font`, `accent`, and `paper` frontmatter or CLI options override the saved profile for that build. The résumé's approved layout remains isolated from profile styling.
+
 ## Résumés
 
 Source résumés are the factual authority. Never invent metrics, dates, responsibilities, ownership, or credentials. Keep master sources at the workspace root and role-tailored Markdown in `resumes/targeted/`; these are private local inputs. The builder parses Markdown into validated `OUTPUT.content.json`, writes canonical HTML from `assets/templates/resume-ats.html`, and renders the PDF from that saved HTML. JSON is generated, not an editorial source. The schema is `references/schemas/resume-content.schema.json`.

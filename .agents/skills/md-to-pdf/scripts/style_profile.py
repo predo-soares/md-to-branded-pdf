@@ -1,0 +1,59 @@
+"""Persist and resolve the user's global PDF style choices."""
+from __future__ import annotations
+
+import json
+import os
+import re
+from pathlib import Path
+
+
+DEFAULT = {"font": "system-ui", "accent": "#1c1c1c", "paper": "#ffffff"}
+FONTS = {"system-ui", "Geist"}
+
+
+def profile_path() -> Path:
+    root = Path(os.environ.get("XDG_CONFIG_HOME", str(Path.home() / ".config")))
+    return root / "md-to-pdf/profile.json"
+
+
+def validate(profile: dict[str, str]) -> dict[str, str]:
+    if set(profile) != set(DEFAULT):
+        raise ValueError("Style profile must define font, accent, and paper")
+    if profile["font"] not in FONTS:
+        raise ValueError(f"Unsupported profile font: {profile['font']}")
+    for key in ("accent", "paper"):
+        if not re.fullmatch(r"#[0-9a-fA-F]{6}", profile[key]):
+            raise ValueError(f"Invalid {key} color; use #RRGGBB")
+    return profile
+
+
+def load() -> dict[str, str] | None:
+    path = profile_path()
+    if not path.exists():
+        return None
+    content = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(content, dict):
+        raise ValueError("Style profile must be a JSON object")
+    return validate(content)
+
+
+def save(profile: dict[str, str]) -> None:
+    path = profile_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(validate(profile), indent=2) + "\n", encoding="utf-8")
+
+
+def onboard() -> dict[str, str]:
+    choice = input("First PDF build: use default style or customize? [default/custom]: ").strip().lower()
+    if choice in ("", "default"):
+        profile = DEFAULT.copy()
+    elif choice == "custom":
+        profile = {
+            "font": input("Font [system-ui/Geist]: ").strip() or DEFAULT["font"],
+            "accent": input("Accent color [#RRGGBB]: ").strip() or DEFAULT["accent"],
+            "paper": input("Paper color [#RRGGBB]: ").strip() or DEFAULT["paper"],
+        }
+    else:
+        raise ValueError("Choose 'default' or 'custom'")
+    save(profile)
+    return profile

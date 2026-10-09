@@ -5,6 +5,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import os
 from pathlib import Path
 
 
@@ -21,7 +22,7 @@ class TemplateRoutingTests(unittest.TestCase):
         result = subprocess.run(
             [sys.executable, str(BUILD), str(source), *options,
              "--html", str(directory / "output.html"), "--pdf", str(directory / "output.pdf")],
-            text=True, capture_output=True,
+            text=True, capture_output=True, env={**os.environ, "XDG_CONFIG_HOME": str(directory / "config")},
         )
         return result, directory
 
