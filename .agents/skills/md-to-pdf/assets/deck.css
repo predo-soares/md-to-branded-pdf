@@ -30,3 +30,6 @@ body { font: 16pt/1.35 var(--font-body); }
 .slide .metric { min-width: 45mm; border-top: 1mm solid var(--accent); padding-top: 4mm; display: flex; flex-direction: column; }
 .slide .metric strong { font-size: 29pt; }
 .slide .metric span { color: var(--muted); }
+.slide .generated-diagram { margin: 7mm 0; break-inside: avoid; }
+.slide .generated-diagram figcaption { font-size: 15pt; font-weight: 700; margin-bottom: 4mm; }
+.slide .generated-diagram svg { width: 100%; height: auto; max-height: 112mm; }

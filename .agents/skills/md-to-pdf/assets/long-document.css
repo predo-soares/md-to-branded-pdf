@@ -27,3 +27,6 @@ img { display: block; max-width: 100%; max-height: 180mm; break-inside: avoid; }
 pre { white-space: pre-wrap; overflow-wrap: anywhere; padding: 9pt; background: var(--code-background); }
 blockquote { border-left: 2pt solid var(--rule); margin: 12pt 0; padding-left: 12pt; color: var(--muted); }
 a { color: inherit; }
+.generated-diagram { break-inside: avoid; margin: 14pt 0; }
+.generated-diagram svg { width: 100%; height: auto; max-height: 170mm; }
+.generated-diagram figcaption { font-weight: 700; color: var(--ink); margin-bottom: 5pt; }
