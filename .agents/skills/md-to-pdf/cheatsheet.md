@@ -15,6 +15,7 @@ To build a portfolio, use `--template portfolio`. Each `## Case Study` needs `##
 To build an analytical report, use `--template analytical-report`. Write `## Thesis`, `## Evidence`, `## Analysis`, `## Risks`, and `## Conclusion` in that order. Add `## Financial Context` before the conclusion only when the source contains relevant financial evidence. The generated `.content.json` records the validated sections; tables and source links remain in the PDF.
 To build release notes, use `--template changelog`. Start with `# Changelog`, then add releases such as `## [1.2.0] - 2026-09-15` and categories such as `### Added` with at least one entry. `## Unreleased` is supported. The generated `.content.json` records release order and dates.
 To build a PDF pitch deck, use `--template pitch-deck`. Write a `#` cover title, then separate slides with a top-level `---` line. Give each slide a heading; middle slides state an assertion and supporting evidence, and the final slide gives a next step. The output is 16:9, one PDF page per slide. An overfull slide stops the build, so edit its content and rebuild. The generated `.slides.json` lists slide layouts and titles.
+For a comparison slide, use a `## Comparison: ...` heading followed by a three-column Markdown table. For a metrics slide, use `## Metrics: ...` and a two-column label/value table. See `references/examples/pitch-deck-comparison.en.md` for synthetic examples.
 
 Choose the Template explicitly with `--template` or YAML frontmatter:
 

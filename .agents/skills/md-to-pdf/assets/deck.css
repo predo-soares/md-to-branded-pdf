@@ -15,3 +15,11 @@ body { font: 16pt/1.35 var(--font-body); }
 .slide.cover, .slide.closing { display: flex; flex-direction: column; justify-content: center; }
 .slide.cover h1, .slide.closing h2 { font-size: 42pt; }
 .slide.assertion { border-top: 4mm solid var(--accent); padding-top: 20mm; }
+.slide.comparison, .slide.metrics { border-top: 4mm solid var(--accent); padding-top: 18mm; }
+.slide.comparison h2, .slide.metrics h2 { margin-bottom: 8mm; }
+.slide table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 15pt; }
+.slide th, .slide td { padding: 5mm 4mm; border-bottom: 0.4mm solid #d2d9df; vertical-align: top; text-align: left; }
+.slide th { color: var(--muted); font-size: 12pt; font-weight: 700; }
+.slide tr { break-inside: avoid; }
+.slide.metrics td:last-child { font-size: 22pt; font-weight: 700; color: var(--accent); }
+.slide.metrics td:first-child { width: 65%; }

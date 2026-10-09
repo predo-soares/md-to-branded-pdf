@@ -32,6 +32,27 @@ def split_slides(markdown: str) -> list[str]:
     return slides
 
 
+def validate_structured_slide(tokens: list, layout: str, number: int) -> None:
+    tables = [token for token in tokens if token.type == "table_open"]
+    if len(tables) != 1:
+        raise ValueError(f"Pitch deck slide {number} {layout} layout needs exactly one Markdown table")
+    widths = []
+    inside = False
+    columns = 0
+    for token in tokens:
+        if token.type == "tr_open":
+            inside = True
+            columns = 0
+        elif token.type in {"th_open", "td_open"} and inside:
+            columns += 1
+        elif token.type == "tr_close":
+            widths.append(columns)
+            inside = False
+    expected = 3 if layout == "comparison" else 2
+    if len(widths) < 2 or any(width != expected for width in widths):
+        raise ValueError(f"Pitch deck slide {number} {layout} table needs {expected} columns and at least one data row")
+
+
 def build(source: Path, html_output: Path, pdf_output: Path, *, markdown: str | None = None,
           title_override: str | None = None, language: str = "en",
           style_profile: dict[str, str] | None = None, style_override: bool = False,
@@ -48,9 +69,15 @@ def build(source: Path, html_output: Path, pdf_output: Path, *, markdown: str | 
         if not headings or not headings[0]:
             raise ValueError(f"Pitch deck slide {index + 1} needs a title heading")
         layout = "cover" if index == 0 else "closing" if index == len(slides) - 1 else "assertion"
+        if layout == "assertion" and headings[0].lower().startswith("comparison:"):
+            layout = "comparison"
+        elif layout == "assertion" and headings[0].lower().startswith("metrics:"):
+            layout = "metrics"
         if (layout == "cover" and not any(token.type == "heading_open" and token.tag == "h1"
                                           for token in tokens)):
             raise ValueError("Pitch deck cover needs a # title")
+        if layout in {"comparison", "metrics"}:
+            validate_structured_slide(tokens, layout, index + 1)
         validate_and_rewrite(tokens, source, verified_image_hosts or set())
         content = parser.renderer.render(tokens, parser.options, {})
         rendered.append(f'<section class="slide {layout}" data-slide="{index + 1}" data-layout="{layout}">{content}</section>')
