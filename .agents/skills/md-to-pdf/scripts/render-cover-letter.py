@@ -57,6 +57,8 @@ def build(source: Path, html_output: Path, pdf_output: Path, *, markdown: str | 
     document = TEMPLATE.read_text(encoding="utf-8")
     body_markup = [f"<p>{_paragraph(paragraph)}</p>" for paragraph in body]
     fields = {
+        "FONT_FACE": (f'@font-face {{ font-family: "Geist"; src: url("{(TEMPLATE.parent.parent / "geist-latin.woff2").as_uri()}") '
+                      'format("woff2"); font-weight: 100 900; }'),
         "LANG": html.escape(language, quote=True),
         "TITLE": html.escape(title_override or f'Cover Letter — {values["SUBJECT"]}'),
         "NAME": html.escape(values["NAME"]),

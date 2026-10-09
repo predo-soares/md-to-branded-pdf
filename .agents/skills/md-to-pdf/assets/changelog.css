@@ -1,4 +1,4 @@
-:root { --paper: #fff; --ink: #1d1d1b; --muted: #555; --rule: #d2d2d2; --font-body: system-ui, sans-serif; }
+:root { --paper: #fff; --ink: #1d1d1b; --muted: #555; --rule: #d2d2d2; --font-body: "Geist", Arial, sans-serif; }
 @page { size: A4; margin: 20mm; }
 body { font: 10.5pt/1.45 var(--font-body); color: var(--ink); background: var(--paper); }
 h1 { font-size: 24pt; line-height: 1.15; margin: 0 0 18pt; }

@@ -19,16 +19,16 @@ EXAMPLES = ROOT / "references/examples"
 A4 = (595.28, 841.89)
 WIDE = (907.09, 510.24)
 CASES = [
-    ("plain-document", "plain-document.en.md", 1, A4),
-    ("proposal", "proposal.pt-BR.md", 2, A4),
-    ("resume", "resume.en.md", 2, A4),
+    ("plain-document", "plain-document.en.md", 2, A4),
+    ("proposal", "proposal.pt-BR.md", 3, A4),
+    ("resume", "resume.en.md", 1, A4),
     ("cover-letter", "cover-letter.en.md", 1, A4),
     ("one-pager", "one-pager.en.md", 1, A4),
-    ("long-document", "long-document.en.md", 2, A4),
-    ("portfolio", "portfolio.en.md", 1, A4),
+    ("long-document", "long-document.en.md", 3, A4),
+    ("portfolio", "portfolio.en.md", 2, A4),
     ("analytical-report", "analytical-report.en.md", 2, A4),
-    ("changelog", "changelog.en.md", 1, A4),
-    ("pitch-deck", "pitch-deck.en.md", 3, WIDE),
+    ("changelog", "changelog.en.md", 2, A4),
+    ("pitch-deck", "pitch-deck.en.md", 5, WIDE),
 ]
 LETTER_FIELDS = {
     "CAREER_NAME": "Sample Person", "CAREER_LOCATION": "City, Country",
@@ -116,7 +116,9 @@ def generate(output: Path) -> dict:
     review_lines.extend(["", "## Release decision", "", "- [ ] Every Template has a recorded human decision.",
                          "- [ ] All defects are fixed and the affected PDFs are regenerated and reviewed.",
                          "- [ ] Public release is explicitly approved by the owner.", ""])
-    (output / "human-review.md").write_text("\n".join(review_lines), encoding="utf-8")
+    human_review = output / "human-review.md"
+    if not human_review.exists():
+        human_review.write_text("\n".join(review_lines), encoding="utf-8")
     return manifest
 
 

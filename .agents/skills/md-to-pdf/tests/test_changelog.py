@@ -32,9 +32,9 @@ class ChangelogTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr)
             content = json.loads((root / "changelog.content.json").read_text())
             self.assertEqual([r["version"] for r in content["releases"]],
-                             ["1.2.0", "1.1.0", "1.0.0"])
+                             ["1.2.0", "1.1.0", "1.0.0", "0.9.0"])
             self.assertEqual([c["name"] for c in content["releases"][0]["categories"]],
-                             ["Added", "Changed", "Fixed"])
+                             ["Added", "Changed", "Fixed", "Documentation"])
             with fitz.open(root / "changelog.pdf") as pdf:
                 text = "\n".join(page.get_text() for page in pdf)
                 links = [link["uri"] for page in pdf for link in page.get_links()]

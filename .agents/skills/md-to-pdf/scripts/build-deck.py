@@ -78,6 +78,9 @@ def build(source: Path, html_output: Path, pdf_output: Path, *, markdown: str | 
     rendered = []
     metadata = []
     slide_tokens = []
+    selected = (style_profile or {}).get("font", "Geist")
+    svg_font = ("SelectedFont" if selected.startswith(("google:", "fontsource:")) else
+                "UserSelectedFont" if selected not in {"Geist", "system-ui"} else selected)
     for index, slide in enumerate(slides):
         tokens = parser.parse(slide)
         headings = [tokens[position + 1].content.strip() for position, token in enumerate(tokens)
@@ -95,8 +98,8 @@ def build(source: Path, html_output: Path, pdf_output: Path, *, markdown: str | 
         if layout in {"comparison", "metrics"}:
             validate_structured_slide(tokens, layout, index + 1)
         validate_and_rewrite(tokens, source, verified_image_hosts or set())
-        replace_chart_fences(tokens)
-        replace_diagram_fences(tokens)
+        replace_chart_fences(tokens, svg_font)
+        replace_diagram_fences(tokens, svg_font)
         slide_tokens.append(tokens)
         content = parser.renderer.render(tokens, parser.options, {})
         rendered.append(f'<section class="slide {layout}" data-slide="{index + 1}" data-layout="{layout}">{content}</section>')

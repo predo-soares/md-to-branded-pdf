@@ -4,7 +4,7 @@
   --muted: #555;
   --rule: #ccc;
   --code-background: #f3f3f3;
-  --font-body: system-ui, sans-serif;
+  --font-body: "Geist", Arial, sans-serif;
 }
 
 @page { size: A4; margin: 22mm 20mm 20mm; }
@@ -28,5 +28,5 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; padding: 9pt; background: 
 blockquote { border-left: 2pt solid var(--rule); margin: 12pt 0; padding-left: 12pt; color: var(--muted); }
 a { color: inherit; }
 .generated-diagram { break-inside: avoid; margin: 14pt 0; }
-.generated-diagram svg { width: 100%; height: auto; max-height: 170mm; }
+.generated-diagram svg { width: 100%; height: auto; max-height: 170mm; font-family: var(--font-body); }
 .generated-diagram figcaption { font-weight: 700; color: var(--ink); margin-bottom: 5pt; }

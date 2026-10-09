@@ -4,7 +4,7 @@
   --muted: #555;
   --accent: #383733;
   --rule: #d8d8d8;
-  --font-body: Arial, sans-serif;
+  --font-body: "Geist", Arial, sans-serif;
 }
 
 @page { size: A4; margin: 20mm; }

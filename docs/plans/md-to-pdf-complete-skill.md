@@ -12,7 +12,7 @@ Kami is an architectural and quality reference, not the source of this project's
 
 | Type | Content shape | Page contract |
 | --- | --- | --- |
-| Résumé | Existing validated résumé structure, skills last | Approved two-page A4 layout |
+| Résumé | Existing validated résumé structure, skills last | Approved A4 layout: one page when content fits, second page only when needed |
 | Cover letter | Sender, recipient, subject, salutation, body, sign-off | One A4 page |
 | Proposal | Cover metadata, numbered sections, tables where meaningful | A4; length follows content |
 | Plain document | General Markdown headings, lists, tables, code, images | A4; natural pagination |

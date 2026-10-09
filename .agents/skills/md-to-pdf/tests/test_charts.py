@@ -36,6 +36,8 @@ class ChartTests(unittest.TestCase):
                 with fitz.open(root / "output.pdf") as pdf:
                     self.assertGreaterEqual(len(pdf), expected_pages)
                     text = "\n".join(page.get_text() for page in pdf)
+                    fonts = {font[3].split("+")[-1] for page in pdf for font in page.get_fonts()}
+                    self.assertTrue(all(name.startswith("Geist") for name in fonts), fonts)
                 for label in ("Alpha", "Beta", "Gamma", "Week 1", "Week 2", "Week 3", "Sessions", "Completed"):
                     self.assertIn(label, text)
                 for value in ("3 tasks", "5 tasks", "4 tasks", "2", "4", "3"):

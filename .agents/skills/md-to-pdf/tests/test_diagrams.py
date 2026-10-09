@@ -35,6 +35,8 @@ class DiagramTests(unittest.TestCase):
                     if template == "pitch-deck":
                         self.assertEqual(len(pdf), 4)
                     text = "\n".join(page.get_text() for page in pdf)
+                    fonts = {font[3].split("+")[-1] for page in pdf for font in page.get_fonts()}
+                    self.assertTrue(all(name.startswith("Geist") for name in fonts), fonts)
                 for label in ("Draft", "Review", "Trial", "Decision", "Receive draft",
                               "Review evidence", "Revise", "Approve", "Needs work", "Ready"):
                     self.assertIn(label, text)

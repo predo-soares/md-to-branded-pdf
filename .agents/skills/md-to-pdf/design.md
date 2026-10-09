@@ -1,12 +1,14 @@
 # Design system
 
-The project default is a restrained sans-serif document system on white A4 paper. The plain-document Template uses 20 mm margins, 11 pt body text, dark ink, understated rules, and a quiet code background. Headings are distinct without decorative serif styling. Its executable defaults live in `assets/plain-document.css`.
+The project default is a restrained Geist document system on white A4 paper. Every Template uses bundled Geist by default, including text in generated charts and diagrams. The plain-document Template uses 20 mm margins, 11 pt body text, dark ink, understated rules, and a quiet code background. Headings are distinct without decorative serif styling. Its executable defaults live in `assets/plain-document.css`.
 
 Each Template owns its layout contract and CSS. The approved résumé remains visually isolated in `assets/templates/resume-ats.html`; do not apply these plain-document defaults to it. Edit content to fit a Template. Change layout rules only when the user explicitly asks to change the Template or this design guide.
+The résumé uses its established hierarchy and Geist typography. Its content flows naturally onto one or two A4 pages; earlier experience no longer starts a page by rule. The renderer does not compress text to hold a page count, and more than two pages are rejected.
 
 The PDF is rendered from saved HTML with WeasyPrint. Keep the generated HTML as the reviewable visual source, and check actual PDF pages before approving a layout.
+For the file that owns each Template or component, see `references/template-editing.md`.
 
-Global profile choices are limited to font, accent, and paper color. The initial choices are system UI or bundled Geist and six-digit hex colors. Document-level choices override the profile only for that build. The plain-document Template applies those choices through CSS variables; each later Template must define which profile values it accepts without weakening its layout contract.
+Global profile choices are limited to font, accent, and paper color. The initial font is bundled Geist; custom choices include system UI and supported local or downloaded fonts. Document-level choices override the profile only for that build. The résumé remains fixed to Geist and its approved design. The other Templates apply profile choices without weakening their layout contracts.
 The proposal Template retains its existing Geist-based cover and numbered-section styling under default settings. A customized profile can change only its font, accent, and paper color; page geometry, section structure, and spacing stay under the proposal Template's control.
 The cover-letter Template preserves its name, contact, date, recipient, subject, salutation, body, and closing hierarchy. It uses one A4 page with 18 mm top/bottom and 20 mm side margins. Custom profile choices may change font, accent, and paper without changing this layout.
 The one-pager Template uses one A4 page with 20 mm margins, a prominent title, a central-message paragraph, and compact supporting sections. Its executable rules live in `assets/one-pager.css`. Metrics have no reserved space: include a table or list only when the source provides values. An overflow error calls for editorial content changes unless the user explicitly changes the Template or this guide.

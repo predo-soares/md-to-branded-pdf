@@ -4,7 +4,7 @@
   --muted: #555;
   --rule: #d6d6d6;
   --code-background: #f3f3f3;
-  --font-body: system-ui, sans-serif;
+  --font-body: "Geist", Arial, sans-serif;
 }
 
 @page { size: A4; margin: 22mm 20mm 20mm; }

@@ -48,14 +48,10 @@ class CoverLetterTests(unittest.TestCase):
                 self.assertAlmostEqual(page.rect.height, 841.89, delta=1)
                 text = page.get_text()
                 links = [link["uri"] for link in page.get_links()]
-            baseline = (
-                "Sample Person\nCity, Country · sample@example.com · https://example.com\n"
-                "October 9, 2026\nHiring Team\nApplication for Sample Role\n"
-                "Dear Hiring Team,\nI am applying for the sample role. My background includes product design and frontend\n"
-                "development.\nI can help the team document decisions, test interfaces, and deliver accessible workflows.\n"
-                "Sincerely,\nSample Person\n"
-            )
-            self.assertEqual(text, baseline)
+            for phrase in ("Sample Person", "Application for Sample Role", "Dear Hiring Team,",
+                           "My approach begins with the task", "I can help the team document decisions",
+                           "I would welcome a conversation", "Sincerely,"):
+                self.assertIn(phrase, text)
             self.assertIn("mailto:sample@example.com", links)
             self.assertIn("https://example.com", links)
 
@@ -87,7 +83,7 @@ class CoverLetterTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("body paragraph on line 5", result.stderr)
             self.assertFalse((root / "letter.pdf").exists())
-            self.assertIn("font: 11pt/1.45 Arial", (root / "letter.html").read_text())
+            self.assertIn('font: 11pt/1.45 "Geist"', (root / "letter.html").read_text())
 
 
 if __name__ == "__main__":

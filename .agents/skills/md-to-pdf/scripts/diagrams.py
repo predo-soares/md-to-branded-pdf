@@ -106,7 +106,7 @@ def _flowchart(data: dict) -> str:
     return "".join(parts)
 
 
-def render(raw: str) -> str:
+def render(raw: str, font_family: str = "Geist") -> str:
     try:
         data = json.loads(raw)
     except json.JSONDecodeError as error:
@@ -115,11 +115,12 @@ def render(raw: str) -> str:
         raise ValueError("Diagram type must be timeline or flowchart")
     title = html.escape(_text(data.get("title"), "title", 100))
     svg = _timeline(data) if data["type"] == "timeline" else _flowchart(data)
+    svg = svg.replace("<text ", f'<text font-family="{html.escape(font_family, quote=True)}" ')
     return f'<figure class="generated-diagram {data["type"]}-diagram" aria-label="{title}"><figcaption>{title}</figcaption>{svg}</figure>'
 
 
-def replace_diagram_fences(tokens: list[Token]) -> None:
+def replace_diagram_fences(tokens: list[Token], font_family: str = "Geist") -> None:
     for token in tokens:
         if token.type == "fence" and token.info.strip() == "diagram":
             token.type = "html_block"
-            token.content = render(token.content) + "\n"
+            token.content = render(token.content, font_family) + "\n"

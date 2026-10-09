@@ -4,7 +4,7 @@
   --muted: #555;
   --rule: #ccc;
   --code-background: #f3f3f3;
-  --font-body: system-ui, sans-serif;
+  --font-body: "Geist", Arial, sans-serif;
 }
 
 @page { size: A4; margin: 20mm; }
@@ -18,5 +18,6 @@ table { width: 100%; border-collapse: collapse; }
 th, td { border-bottom: 1px solid var(--rule); padding: 5pt; text-align: left; vertical-align: top; }
 tr, img, pre { break-inside: avoid; }
 pre { white-space: pre-wrap; overflow-wrap: anywhere; padding: 8pt; background: var(--code-background); }
+pre, code { font-family: var(--font-body); }
 img { max-width: 100%; }
 a { color: var(--accent, var(--ink)); }

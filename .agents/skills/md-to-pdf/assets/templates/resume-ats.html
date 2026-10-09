@@ -6,9 +6,10 @@
 <meta name="author" content="{{AUTHOR}}">
 <title>{{TITLE}}</title>
 <style>
+{{FONT_FACE}}
 @page { size: A4; margin: 18mm 12mm 16mm; }
 * { box-sizing: border-box; }
-body { margin: 0; background: #f8fafc; color: #262626; font: 9.5pt/1.31 Arial, Helvetica, sans-serif; }
+body { margin: 0; background: #f8fafc; color: #262626; font: 9.5pt/1.31 "Geist", Arial, sans-serif; }
 .page { width: 210mm; min-height: 297mm; margin: 18px auto; padding: 18mm 12mm 16mm; background: #fff; }
 h1, h2, h3, p { margin: 0; }
 strong { font-weight: 400; }
@@ -28,7 +29,7 @@ h2 { font-size: 11pt; line-height: 1.2; font-weight: 400; text-transform: upperc
 .company-description { color: #8b8b8b; font-size: 8.8pt; line-height: 1.25; margin-top: 1pt; }
 .job ul { margin: 5pt 0 0; padding-left: 11pt; }
 .job li { margin: 0 0 1.5pt; padding-left: 0; font-size: 9pt; line-height: 1.36; }
-.earlier-experience { break-before: page; page-break-before: always; }
+.earlier-experience { break-inside: avoid; }
 .earlier-experience h3 { font-size: 11pt; font-weight: 400; text-transform: uppercase; margin-bottom: 6pt; }
 .earlier-experience ul { margin-top: 0; }
 .skills p { margin: 0 0 2pt; }

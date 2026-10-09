@@ -7,7 +7,7 @@ import re
 from pathlib import Path
 
 
-DEFAULT = {"font": "system-ui", "accent": "#1c1c1c", "paper": "#ffffff"}
+DEFAULT = {"font": "Geist", "accent": "#1c1c1c", "paper": "#ffffff"}
 FONTS = {"system-ui", "Geist"}
 FONT_EXTENSIONS = {".ttf", ".otf", ".woff", ".woff2"}
 
@@ -68,7 +68,7 @@ def onboard() -> dict[str, str]:
         profile = DEFAULT.copy()
     elif choice == "custom":
         profile = {
-            "font": input("Font [system-ui/Geist/local path/google:Family/fontsource:id]: ").strip() or DEFAULT["font"],
+            "font": input("Font [Geist/system-ui/local path/google:Family/fontsource:id]: ").strip() or DEFAULT["font"],
             "accent": input("Accent color [#RRGGBB]: ").strip() or DEFAULT["accent"],
             "paper": input("Paper color [#RRGGBB]: ").strip() or DEFAULT["paper"],
         }

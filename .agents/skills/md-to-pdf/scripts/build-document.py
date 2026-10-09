@@ -33,8 +33,12 @@ def build(source: Path, html_output: Path, pdf_output: Path, *, markdown: str | 
     tokens = parser.parse(markdown)
     verified_image_hosts = verified_image_hosts or set()
     validate_and_rewrite(tokens, source, verified_image_hosts)
-    replace_chart_fences(tokens)
-    replace_diagram_fences(tokens)
+    selected = (style_profile or {}).get("font", "Geist")
+    svg_font = ("GoogleSelectedFont" if selected.startswith("google:") else
+                "FontsourceSelectedFont" if selected.startswith("fontsource:") else
+                "UserSelectedFont" if selected not in {"Geist", "system-ui"} else selected)
+    replace_chart_fences(tokens, svg_font)
+    replace_diagram_fences(tokens, svg_font)
     body = parser.renderer.render(tokens, parser.options, {})
     if figure_images:
         body = re.sub(

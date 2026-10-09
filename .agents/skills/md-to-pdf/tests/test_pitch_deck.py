@@ -32,14 +32,14 @@ class PitchDeckTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr)
             metadata = json.loads((root / "deck.slides.json").read_text())
             self.assertEqual([slide["layout"] for slide in metadata],
-                             ["cover", "assertion", "closing"])
+                             ["cover", "assertion", "comparison", "metrics", "closing"])
             with fitz.open(root / "deck.pdf") as pdf:
-                self.assertEqual(len(pdf), 3)
+                self.assertEqual(len(pdf), 5)
                 self.assertTrue(all(abs(page.rect.width / page.rect.height - 16 / 9) < 0.01
                                     for page in pdf))
                 self.assertIn("Sample Product", pdf[0].get_text())
                 self.assertIn("three of five", pdf[1].get_text())
-                self.assertIn("Next step", pdf[2].get_text())
+                self.assertIn("Next step", pdf[4].get_text())
                 self.assertIn("https://example.org/methods",
                               [link["uri"] for link in pdf[1].get_links()])
 

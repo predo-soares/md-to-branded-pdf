@@ -27,9 +27,10 @@ def build(source: Path, html_output: Path, pdf_output: Path, *, markdown: str | 
     html_output.write_text(render_document(content), encoding="utf-8")
     render_pdf(html_output, pdf_output)
     with fitz.open(pdf_output) as pdf:
-        if len(pdf) != 2 or any(abs(page.rect.width - 595.28) > 1 or
+        if len(pdf) not in (1, 2) or any(abs(page.rect.width - 595.28) > 1 or
                                 abs(page.rect.height - 841.89) > 1 for page in pdf):
-            raise ValueError("Résumé content does not fit the approved two-page A4 layout")
+            pdf_output.unlink(missing_ok=True)
+            raise ValueError("Résumé content exceeds the approved one- or two-page A4 layout")
 
 
 def main() -> None:

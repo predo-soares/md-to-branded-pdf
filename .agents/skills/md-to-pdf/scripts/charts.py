@@ -39,7 +39,7 @@ def _parse(raw: str) -> dict:
     return chart
 
 
-def render(raw: str) -> str:
+def render(raw: str, font_family: str = "Geist") -> str:
     chart = _parse(raw)
     kind = chart["type"]
     data = chart["data"]
@@ -74,12 +74,13 @@ def render(raw: str) -> str:
         parts.append(f'<polyline points="{points}" fill="none" stroke="#245a7a" stroke-width="4"/>')
         parts.extend(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="5" fill="#245a7a"/>' for x, y in positions)
     parts.append("</svg>")
+    svg = "".join(parts).replace("<text ", f'<text font-family="{html.escape(font_family, quote=True)}" ')
     return (f'<figure class="generated-chart {kind}-chart"><figcaption>{title}</figcaption>'
-            + "".join(parts) + "</figure>")
+            + svg + "</figure>")
 
 
-def replace_chart_fences(tokens: list[Token]) -> None:
+def replace_chart_fences(tokens: list[Token], font_family: str = "Geist") -> None:
     for token in tokens:
         if token.type == "fence" and token.info.strip() == "chart":
             token.type = "html_block"
-            token.content = render(token.content) + "\n"
+            token.content = render(token.content, font_family) + "\n"

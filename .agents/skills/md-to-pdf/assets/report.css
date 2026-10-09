@@ -4,7 +4,7 @@
   --muted: #555;
   --rule: #d2d2d2;
   --code-background: #f4f4f4;
-  --font-body: system-ui, sans-serif;
+  --font-body: "Geist", Arial, sans-serif;
 }
 
 @page { size: A4; margin: 22mm 20mm 20mm; }
@@ -26,7 +26,7 @@ pre { background: var(--code-background); padding: 9pt; white-space: pre-wrap; }
 blockquote { margin: 12pt 0; padding-left: 12pt; border-left: 2pt solid var(--rule); color: var(--muted); }
 a { color: inherit; }
 .generated-chart { break-inside: avoid; margin: 14pt 0; }
-.generated-chart svg { width: 100%; height: auto; }
+.generated-chart svg { width: 100%; height: auto; font-family: var(--font-body); }
 .generated-chart figcaption { font-weight: 700; color: var(--ink); margin-bottom: 5pt; }
 .metrics { display: flex; flex-wrap: wrap; gap: 12pt; }
 .metric { display: flex; flex-direction: column; min-width: 90pt; padding: 8pt; border-top: 2pt solid var(--accent, #245a7a); }

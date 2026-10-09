@@ -14,6 +14,7 @@ from parse_resume import validate_content
 
 SKILL_DIR = Path(__file__).resolve().parent.parent
 TEMPLATE = SKILL_DIR / "assets/templates/resume-ats.html"
+GEIST = SKILL_DIR / "assets/geist-latin.woff2"
 HEADINGS = {
     "pt-BR": ("Resumo", "Experiência Profissional", "Experiência Anterior", "Formação", "Idiomas", "Competências"),
     "en": ("Summary", "Professional Experience", "Earlier Experience", "Education", "Languages", "Skills"),
@@ -70,6 +71,7 @@ def render_document(content: dict[str, Any]) -> str:
     )
     document = TEMPLATE.read_text(encoding="utf-8")
     substitutions = {
+        "FONT_FACE": f'@font-face {{ font-family: "Geist"; src: url("{GEIST.as_uri()}") format("woff2"); font-weight: 100 900; }}',
         "LANG": html.escape(language, quote=True),
         "AUTHOR": html.escape(identity["name"], quote=True),
         "TITLE": html.escape(f'{identity["name"]} — {identity["headline"]}', quote=True),

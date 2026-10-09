@@ -18,7 +18,7 @@ FIXTURE = ROOT / "references/examples/resume.en.md"
 
 
 class ResumeTests(unittest.TestCase):
-    def test_validated_json_saved_html_two_pages_and_skills_last(self) -> None:
+    def test_validated_json_saved_html_one_page_when_content_fits_and_skills_last(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             config = root / "config/md-to-pdf/profile.json"
@@ -35,7 +35,7 @@ class ResumeTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr)
             content = json.loads((root / "resume.content.json").read_text())
             self.assertEqual([item.get("company") for item in content["experience"] if item["kind"] == "role"],
-                             ["Example Company", "Sample Studio"])
+                             ["Example Company", "Sample Studio", "Fictional Labs", "Demo Collective"])
             self.assertEqual(content["experience"][0]["datesLocation"], "2024 – 2026 · City, Country")
             self.assertEqual(content["experience"][1]["datesLocation"], "2022 – 2024 · Remote")
             html = html_path.read_text()
@@ -43,7 +43,7 @@ class ResumeTests(unittest.TestCase):
             self.assertNotIn("#ff0000", html)
             self.assertNotIn("GoogleSelectedFont", html)
             with fitz.open(pdf_path) as pdf:
-                self.assertEqual(len(pdf), 2)
+                self.assertEqual(len(pdf), 1)
                 self.assertTrue(all(abs(page.rect.width - 595.28) < 1 and
                                     abs(page.rect.height - 841.89) < 1 for page in pdf))
                 text = "\n".join(page.get_text() for page in pdf)
@@ -63,6 +63,31 @@ class ResumeTests(unittest.TestCase):
             )
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("does not accept title or style overrides", result.stderr)
+
+    def test_second_page_appears_only_when_content_requires_it(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / "dense-resume.md"
+            base = FIXTURE.read_text()
+            extra = "".join(
+                f"\n### Fictional Team {index} — Interface Engineer\n"
+                "**2020 – 2021 · Remote**\n"
+                "A synthetic role included to exercise natural pagination.\n"
+                "- Built a small interface component from an approved specification.\n"
+                "- Reviewed rendered behavior with a sample team.\n"
+                for index in range(4)
+            )
+            source.write_text(base.replace("## Education", extra + "\n## Education"))
+            result = subprocess.run(
+                [sys.executable, str(BUILD), str(source), "--template", "resume",
+                 "--html", str(root / "resume.html"), "--pdf", str(root / "resume.pdf")],
+                capture_output=True, text=True,
+                env={**os.environ, "XDG_CONFIG_HOME": str(root / "config")},
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            with fitz.open(root / "resume.pdf") as pdf:
+                self.assertEqual(len(pdf), 2)
+                self.assertIn("SKILLS", pdf[-1].get_text())
 
 
 if __name__ == "__main__":
