@@ -13,6 +13,7 @@ To build a one-pager, use `--template one-pager`. Start with `# Title`, then a s
 To build a multi-chapter document, use `--template long-document`. It paginates naturally on A4. Put an italic caption immediately after a standalone Markdown image to keep them together as a figure; headings and table rows avoid awkward splits where possible.
 To build a portfolio, use `--template portfolio`. Each `## Case Study` needs `### Context` and `### Approach`; add `### Outcome` only when you have a supported result. Images are optional and need descriptive alt text. The generated `.content.json` records the validated case structure.
 To build an analytical report, use `--template analytical-report`. Write `## Thesis`, `## Evidence`, `## Analysis`, `## Risks`, and `## Conclusion` in that order. Add `## Financial Context` before the conclusion only when the source contains relevant financial evidence. The generated `.content.json` records the validated sections; tables and source links remain in the PDF.
+To build release notes, use `--template changelog`. Start with `# Changelog`, then add releases such as `## [1.2.0] - 2026-09-15` and categories such as `### Added` with at least one entry. `## Unreleased` is supported. The generated `.content.json` records release order and dates.
 
 Choose the Template explicitly with `--template` or YAML frontmatter:
 
