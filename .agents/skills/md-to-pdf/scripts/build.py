@@ -14,7 +14,8 @@ from fontsource_fonts import resolve as resolve_fontsource_font
 from style_profile import DEFAULT, FONTS, load as load_profile, onboard, validate as validate_profile
 
 SCRIPTS = Path(__file__).resolve().parent
-TEMPLATES = {"plain-document": "build-document.py", "proposal": "build-proposal.py"}
+TEMPLATES = {"plain-document": "build-document.py", "proposal": "build-proposal.py",
+             "resume": "build-resume.py"}
 
 
 def load_builder(template: str):
@@ -81,12 +82,23 @@ def main() -> None:
         parser.error("Choose a Template with --template or YAML frontmatter 'template'")
     if template not in TEMPLATES:
         parser.error(f"Unknown or unavailable Template: {template}")
-    language = metadata.get("lang", "pt-BR" if template == "proposal" else "en")
-    if not re.fullmatch(r"[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*", language):
+    language = metadata.get("lang", None if template == "resume" else
+                            ("pt-BR" if template == "proposal" else "en"))
+    if language is not None and not re.fullmatch(r"[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*", language):
         parser.error(f"Invalid document language: {language}")
     hosts = {host.lower() for host in args.verified_image_host}
     if any(not re.fullmatch(r"[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+", host) for host in hosts):
         parser.error("--verified-image-host requires a hostname without a URL scheme or path")
+    if template == "resume":
+        if any(key in metadata for key in ("title", "font", "accent", "paper")) or any(
+            value is not None for value in (args.font, args.accent, args.paper)
+        ):
+            parser.error("The approved résumé Template does not accept title or style overrides")
+        try:
+            load_builder(template)(source, html_output, pdf_output, markdown=markdown, language=language)
+        except (ValueError, OSError) as error:
+            parser.error(str(error))
+        return
     try:
         style_profile = load_profile()
         saved_custom_profile = style_profile is not None and style_profile != DEFAULT

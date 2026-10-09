@@ -42,8 +42,8 @@ def _parse_contacts(lines: list[str]) -> list[dict[str, str]]:
     return contacts
 
 
-def parse_markdown(source: Path) -> dict[str, Any]:
-    lines = source.read_text(encoding="utf-8").splitlines()
+def parse_markdown(source: Path, markdown: str | None = None) -> dict[str, Any]:
+    lines = (markdown if markdown is not None else source.read_text(encoding="utf-8")).splitlines()
     _, name_line = _required_line(lines, lambda line: line.startswith("# "), "name (# Name)")
     name = name_line[2:].strip()
     headline_index, headline_line = _required_line(
