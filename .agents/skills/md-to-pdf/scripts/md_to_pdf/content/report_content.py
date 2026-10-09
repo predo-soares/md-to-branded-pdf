@@ -8,7 +8,7 @@ from jsonschema import Draft202012Validator
 from markdown_it import MarkdownIt
 
 
-SCHEMA = Path(__file__).resolve().parents[1] / "references/schemas/analytical-report-content.schema.json"
+SCHEMA = Path(__file__).resolve().parents[3] / "references/schemas/analytical-report-content.schema.json"
 SECTIONS = {
     "Thesis": "thesis",
     "Evidence": "evidence",

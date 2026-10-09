@@ -14,8 +14,8 @@ import fitz
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
-from charts import render as render_chart
-from diagrams import render as render_diagram
+from md_to_pdf.visuals.charts import render as render_chart
+from md_to_pdf.visuals.diagrams import render as render_diagram
 
 
 class VisualCatalogTests(unittest.TestCase):

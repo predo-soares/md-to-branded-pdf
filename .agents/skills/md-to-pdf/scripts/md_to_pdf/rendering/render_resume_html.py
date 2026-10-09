@@ -9,10 +9,10 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from parse_resume import validate_content
+from md_to_pdf.content.parse_resume import validate_content
 
 
-SKILL_DIR = Path(__file__).resolve().parent.parent
+SKILL_DIR = Path(__file__).resolve().parents[3]
 TEMPLATE = SKILL_DIR / "assets/templates/resume-ats.html"
 GEIST = SKILL_DIR / "assets/geist-latin.woff2"
 HEADINGS = {

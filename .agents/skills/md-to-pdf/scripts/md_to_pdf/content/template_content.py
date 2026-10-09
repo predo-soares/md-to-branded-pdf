@@ -8,7 +8,7 @@ from jsonschema import Draft202012Validator
 from markdown_it import MarkdownIt
 
 
-SCHEMAS = Path(__file__).resolve().parents[1] / "references/schemas"
+SCHEMAS = Path(__file__).resolve().parents[3] / "references/schemas"
 
 
 def _headings(markdown: str) -> list[tuple[str, int, str]]:
@@ -77,7 +77,7 @@ def _long_document(markdown: str) -> dict:
 
 
 def _pitch_deck(markdown: str) -> dict:
-    from deck_content import split_slides
+    from md_to_pdf.content.deck_content import split_slides
     slides = split_slides(markdown)
     content = []
     for index, slide in enumerate(slides):
@@ -93,16 +93,16 @@ def _pitch_deck(markdown: str) -> dict:
 
 def parse(template: str, markdown: str, fallback_title: str = "Document") -> dict:
     if template == "resume":
-        from parse_resume import parse_markdown
+        from md_to_pdf.content.parse_resume import parse_markdown
         return parse_markdown(Path(fallback_title), markdown=markdown)
     if template == "portfolio":
-        from portfolio_content import parse as parse_portfolio
+        from md_to_pdf.content.portfolio_content import parse as parse_portfolio
         return parse_portfolio(markdown)
     if template == "analytical-report":
-        from report_content import parse as parse_report
+        from md_to_pdf.content.report_content import parse as parse_report
         return parse_report(markdown)
     if template == "changelog":
-        from changelog_content import parse as parse_changelog
+        from md_to_pdf.content.changelog_content import parse as parse_changelog
         return parse_changelog(markdown)
     parsers = {"plain-document": lambda: _plain(markdown, fallback_title),
                "proposal": lambda: _proposal(markdown),

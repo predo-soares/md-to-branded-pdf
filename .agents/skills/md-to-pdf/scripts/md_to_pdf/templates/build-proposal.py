@@ -9,10 +9,10 @@ import re
 from pathlib import Path
 
 from markdown_it import MarkdownIt
-from render_html_pdf import _load_weasyprint
+from md_to_pdf.rendering.render_html_pdf import _load_weasyprint
 
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[3]
 TOKENS = ROOT / "assets" / "tokens.css"
 TEMPLATE = ROOT / "assets" / "document.html"
 MARKDOWN = MarkdownIt("commonmark", {"breaks": True}).enable("table")

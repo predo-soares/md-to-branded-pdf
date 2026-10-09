@@ -21,11 +21,11 @@ def validate(profile: dict[str, str]) -> dict[str, str]:
     if set(profile) != set(DEFAULT):
         raise ValueError("Style profile must define font, accent, and paper")
     if profile["font"].startswith("google:"):
-        from google_fonts import FAMILY
+        from md_to_pdf.fonts.google_fonts import FAMILY
         if not FAMILY.fullmatch(profile["font"][7:]):
             raise ValueError(f"Invalid Google Fonts family: {profile['font'][7:]}")
     elif profile["font"].startswith("fontsource:"):
-        from fontsource_fonts import SPEC
+        from md_to_pdf.fonts.fontsource_fonts import SPEC
         if not SPEC.fullmatch(profile["font"][11:]):
             raise ValueError(f"Invalid Fontsource selection: {profile['font'][11:]}")
     elif profile["font"] not in FONTS:

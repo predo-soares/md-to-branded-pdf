@@ -9,7 +9,7 @@ from jsonschema import Draft202012Validator
 from markdown_it import MarkdownIt
 
 
-SCHEMA = Path(__file__).resolve().parents[1] / "references/schemas/changelog-content.schema.json"
+SCHEMA = Path(__file__).resolve().parents[3] / "references/schemas/changelog-content.schema.json"
 RELEASE = re.compile(r"^\[?(?P<version>(?:\d+\.\d+\.\d+|Unreleased))\]?\s*(?:[-—]\s*(?P<date>\d{4}-\d{2}-\d{2}))?$", re.I)
 
 

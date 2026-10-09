@@ -11,7 +11,7 @@ from pathlib import Path
 import fitz
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from render_html_pdf import _load_weasyprint  # noqa: E402
+from md_to_pdf.rendering.render_html_pdf import _load_weasyprint  # noqa: E402
 
 
 ROOT = Path(__file__).resolve().parents[1]

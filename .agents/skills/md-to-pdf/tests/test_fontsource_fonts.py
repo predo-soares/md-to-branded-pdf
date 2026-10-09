@@ -16,7 +16,7 @@ import fitz
 
 SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
 sys.path.insert(0, str(SCRIPTS))
-from fontsource_fonts import resolve  # noqa: E402
+from md_to_pdf.fonts.fontsource_fonts import resolve  # noqa: E402
 
 
 FONT = Path(__file__).resolve().parents[1] / "assets/geist-latin.woff2"
@@ -60,7 +60,7 @@ class FontsourceTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertGreater(command_pdf.stat().st_size, 0)
 
-            module_spec = importlib.util.spec_from_file_location("plain_builder", SCRIPTS / "build-document.py")
+            module_spec = importlib.util.spec_from_file_location("plain_builder", SCRIPTS / "md_to_pdf/templates/build-document.py")
             assert module_spec and module_spec.loader
             builder = importlib.util.module_from_spec(module_spec)
             module_spec.loader.exec_module(builder)

@@ -8,12 +8,12 @@ from pathlib import Path
 from markdown_it import MarkdownIt
 from markdown_it.token import Token
 
-from media_validation import guarded_fetcher, validate_and_rewrite
-from render_html_pdf import _load_weasyprint
+from md_to_pdf.rendering.media_validation import guarded_fetcher, validate_and_rewrite
+from md_to_pdf.rendering.render_html_pdf import _load_weasyprint
 
 
-CSS = Path(__file__).resolve().parents[1] / "assets/one-pager.css"
-GEIST = Path(__file__).resolve().parents[1] / "assets/geist-latin.woff2"
+CSS = Path(__file__).resolve().parents[3] / "assets/one-pager.css"
+GEIST = Path(__file__).resolve().parents[3] / "assets/geist-latin.woff2"
 
 
 def _groups(tokens: list[Token]) -> list[list[Token]]:

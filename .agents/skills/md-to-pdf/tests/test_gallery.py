@@ -12,7 +12,7 @@ import fitz
 
 
 ROOT = Path(__file__).resolve().parents[1]
-GALLERY = ROOT / "scripts/gallery.py"
+GALLERY = ROOT / "scripts/build_review_gallery.py"
 
 
 class GalleryTests(unittest.TestCase):

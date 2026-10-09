@@ -14,7 +14,7 @@ import fitz
 
 SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
 sys.path.insert(0, str(SCRIPTS))
-from google_fonts import resolve  # noqa: E402
+from md_to_pdf.fonts.google_fonts import resolve  # noqa: E402
 
 
 FONT = Path(__file__).resolve().parents[1] / "assets/geist-latin.woff2"
@@ -47,7 +47,7 @@ class GoogleFontsTests(unittest.TestCase):
                              fetcher=lambda _: self.fail("Cache reuse must not fetch"))
             self.assertEqual(first, second)
 
-            spec = importlib.util.spec_from_file_location("plain_builder", SCRIPTS / "build-document.py")
+            spec = importlib.util.spec_from_file_location("plain_builder", SCRIPTS / "md_to_pdf/templates/build-document.py")
             assert spec and spec.loader
             builder = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(builder)

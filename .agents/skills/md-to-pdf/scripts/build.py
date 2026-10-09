@@ -10,12 +10,13 @@ import sys
 from pathlib import Path
 
 import yaml
-from google_fonts import resolve as resolve_google_font
-from fontsource_fonts import resolve as resolve_fontsource_font
-from style_profile import DEFAULT, FONTS, load as load_profile, onboard, validate as validate_profile
-from template_content import parse as parse_content
+from md_to_pdf.fonts.google_fonts import resolve as resolve_google_font
+from md_to_pdf.fonts.fontsource_fonts import resolve as resolve_fontsource_font
+from md_to_pdf.fonts.style_profile import DEFAULT, FONTS, load as load_profile, onboard, validate as validate_profile
+from md_to_pdf.content.template_content import parse as parse_content
 
 SCRIPTS = Path(__file__).resolve().parent
+BUILDERS = SCRIPTS / "md_to_pdf/templates"
 TEMPLATES = {"plain-document": "build-document.py", "proposal": "build-proposal.py",
              "resume": "build-resume.py", "cover-letter": "render-cover-letter.py",
              "one-pager": "build-one-pager.py", "long-document": "build-document.py",
@@ -28,7 +29,7 @@ CHANGELOG_CSS = SCRIPTS.parent / "assets/changelog.css"
 
 
 def load_builder(template: str):
-    module_path = SCRIPTS / TEMPLATES[template]
+    module_path = BUILDERS / TEMPLATES[template]
     spec = importlib.util.spec_from_file_location(f"md_to_pdf_{template.replace('-', '_')}", module_path)
     if spec is None or spec.loader is None:
         raise RuntimeError(f"Cannot load Template builder: {template}")
@@ -127,7 +128,7 @@ def main() -> None:
         if style_profile["font"].startswith("google:"):
             family = style_profile["font"][7:]
             allow = args.allow_font_download
-            from google_fonts import cache_root
+            from md_to_pdf.fonts.google_fonts import cache_root
             if not allow and sys.stdin.isatty():
                 key = __import__("hashlib").sha256(family.casefold().encode()).hexdigest()[:16]
                 if not (cache_root() / key / "manifest.json").exists():

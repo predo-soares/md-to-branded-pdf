@@ -11,7 +11,7 @@ from pathlib import Path
 import fitz
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from media_validation import _image_url  # noqa: E402
+from md_to_pdf.rendering.media_validation import _image_url  # noqa: E402
 
 
 BUILD = Path(__file__).resolve().parents[1] / "scripts/build.py"

@@ -11,7 +11,7 @@ from typing import Any, Callable, Optional, Tuple, Union
 from jsonschema import Draft202012Validator, FormatChecker
 
 
-SKILL_DIR = Path(__file__).resolve().parent.parent
+SKILL_DIR = Path(__file__).resolve().parents[3]
 SCHEMA_PATH = SKILL_DIR / "references/schemas/resume-content.schema.json"
 HEADINGS = {
     "pt-BR": ("Resumo", "Experiência Profissional", "Experiência Anterior", "Formação", "Idiomas", "Competências"),

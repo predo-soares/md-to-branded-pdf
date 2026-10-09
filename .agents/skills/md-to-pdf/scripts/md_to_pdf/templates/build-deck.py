@@ -7,15 +7,15 @@ from pathlib import Path
 
 from markdown_it import MarkdownIt
 
-from charts import replace_chart_fences
-from deck_content import split_slides
-from diagrams import replace_diagram_fences
-from media_validation import guarded_fetcher, validate_and_rewrite
-from render_html_pdf import _load_weasyprint
+from md_to_pdf.visuals.charts import replace_chart_fences
+from md_to_pdf.content.deck_content import split_slides
+from md_to_pdf.visuals.diagrams import replace_diagram_fences
+from md_to_pdf.rendering.media_validation import guarded_fetcher, validate_and_rewrite
+from md_to_pdf.rendering.render_html_pdf import _load_weasyprint
 
 
-CSS = Path(__file__).resolve().parents[1] / "assets/deck.css"
-GEIST = Path(__file__).resolve().parents[1] / "assets/geist-latin.woff2"
+CSS = Path(__file__).resolve().parents[3] / "assets/deck.css"
+GEIST = Path(__file__).resolve().parents[3] / "assets/geist-latin.woff2"
 
 
 def validate_structured_slide(tokens: list, layout: str, number: int) -> None:
