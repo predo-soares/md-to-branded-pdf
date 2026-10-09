@@ -71,6 +71,24 @@ class CoverLetterTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("Set CAREER_NAME", result.stderr)
 
+    def test_dense_letter_identifies_body_paragraph_without_pdf(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / "long-letter.md"
+            body = "Synthetic background detail for overflow testing. " * 280
+            source.write_text("Dear Hiring Team,\n\nShort introduction.\n\n" + body +
+                              "\n\nSincerely,\n\nSample Person\n")
+            result = subprocess.run(
+                [sys.executable, str(BUILD), str(source), "--template", "cover-letter",
+                 "--html", str(root / "letter.html"), "--pdf", str(root / "letter.pdf")],
+                capture_output=True, text=True,
+                env={**os.environ, **FIELDS, "XDG_CONFIG_HOME": str(root / "config")},
+            )
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("body paragraph on line 5", result.stderr)
+            self.assertFalse((root / "letter.pdf").exists())
+            self.assertIn("font: 11pt/1.45 Arial", (root / "letter.html").read_text())
+
 
 if __name__ == "__main__":
     unittest.main()

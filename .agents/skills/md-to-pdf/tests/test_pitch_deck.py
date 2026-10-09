@@ -53,6 +53,7 @@ class PitchDeckTests(unittest.TestCase):
             result = self.build(source, root)
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("Pitch deck overflow", result.stderr)
+            self.assertIn("on slide 2 at paragraph on line", result.stderr)
             self.assertFalse((root / "deck.pdf").exists())
 
 

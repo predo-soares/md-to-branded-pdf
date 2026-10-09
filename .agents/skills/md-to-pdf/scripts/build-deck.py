@@ -55,6 +55,19 @@ def validate_structured_slide(tokens: list, layout: str, number: int) -> None:
         raise ValueError(f"Pitch deck slide {number} {layout} table needs {expected} columns and at least one data row")
 
 
+def _groups(tokens: list) -> list[list]:
+    groups = []
+    current = []
+    for token in tokens:
+        current.append(token)
+        if token.level == 0 and token.nesting <= 0:
+            groups.append(current)
+            current = []
+    if current:
+        groups.append(current)
+    return groups
+
+
 def build(source: Path, html_output: Path, pdf_output: Path, *, markdown: str | None = None,
           title_override: str | None = None, language: str = "en",
           style_profile: dict[str, str] | None = None, style_override: bool = False,
@@ -64,6 +77,7 @@ def build(source: Path, html_output: Path, pdf_output: Path, *, markdown: str | 
     parser = MarkdownIt("commonmark", {"breaks": True, "html": False}).enable("table")
     rendered = []
     metadata = []
+    slide_tokens = []
     for index, slide in enumerate(slides):
         tokens = parser.parse(slide)
         headings = [tokens[position + 1].content.strip() for position, token in enumerate(tokens)
@@ -83,6 +97,7 @@ def build(source: Path, html_output: Path, pdf_output: Path, *, markdown: str | 
         validate_and_rewrite(tokens, source, verified_image_hosts or set())
         replace_chart_fences(tokens)
         replace_diagram_fences(tokens)
+        slide_tokens.append(tokens)
         content = parser.renderer.render(tokens, parser.options, {})
         rendered.append(f'<section class="slide {layout}" data-slide="{index + 1}" data-layout="{layout}">{content}</section>')
         metadata.append({"number": index + 1, "layout": layout, "title": headings[0]})
@@ -101,9 +116,11 @@ def build(source: Path, html_output: Path, pdf_output: Path, *, markdown: str | 
         styles += (f'\n:root {{ --font-body: "{font}", sans-serif; '
                    f'--accent: {style_profile["accent"]}; --paper: {style_profile["paper"]}; }}')
     title = title_override or metadata[0]["title"]
-    document = (f'<!doctype html><html lang="{html.escape(language, quote=True)}"><head>'
+    def document_for(slide_html: str) -> str:
+        return (f'<!doctype html><html lang="{html.escape(language, quote=True)}"><head>'
                 f'<meta charset="utf-8"><title>{html.escape(title)}</title><style>{styles}</style>'
-                f'</head><body>{"".join(rendered)}</body></html>')
+                f'</head><body>{slide_html}</body></html>')
+    document = document_for("".join(rendered))
     html_output.parent.mkdir(parents=True, exist_ok=True)
     pdf_output.parent.mkdir(parents=True, exist_ok=True)
     html_output.write_text(document, encoding="utf-8")
@@ -112,7 +129,26 @@ def build(source: Path, html_output: Path, pdf_output: Path, *, markdown: str | 
                   url_fetcher=guarded_fetcher(verified_image_hosts or set())).render()
     if len(result.pages) != len(slides):
         pdf_output.unlink(missing_ok=True)
-        raise ValueError(f"Pitch deck overflow: {len(slides)} slides produced {len(result.pages)} pages; shorten slide content")
+        cursor = 0
+        for index, (slide, tokens) in enumerate(zip(slides, slide_tokens)):
+            start = markdown.find(slide, cursor)
+            cursor = start + len(slide)
+            line_offset = markdown[:start].count("\n") if start >= 0 else 0
+            layout = metadata[index]["layout"]
+            prefix = []
+            for group in _groups(tokens):
+                prefix.extend(group)
+                content = parser.renderer.render(prefix, parser.options, {})
+                partial = document_for(f'<section class="slide {layout}">{content}</section>')
+                pages = HTML(string=partial, base_url=str(source.parent.resolve()),
+                             url_fetcher=guarded_fetcher(verified_image_hosts or set())).render().pages
+                if len(pages) > 1:
+                    first = group[0]
+                    kind = first.type.removesuffix("_open")
+                    line = line_offset + first.map[0] + 1 if first.map else "unknown"
+                    excerpt = slide.splitlines()[first.map[0]][:70] if first.map else ""
+                    raise ValueError(f"Pitch deck overflow on slide {index + 1} at {kind} on line {line}: {excerpt}")
+        raise ValueError(f"Pitch deck overflow: {len(slides)} slides produced {len(result.pages)} pages")
     result.write_pdf(str(pdf_output))
     html_output.with_suffix(".slides.json").write_text(json.dumps(metadata, ensure_ascii=False, indent=2) + "\n",
                                                      encoding="utf-8")

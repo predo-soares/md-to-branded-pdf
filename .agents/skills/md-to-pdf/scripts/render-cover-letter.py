@@ -11,7 +11,7 @@ from urllib.parse import urlparse
 
 import fitz
 
-from render_html_pdf import render_pdf
+from render_html_pdf import _load_weasyprint
 
 
 TEMPLATE = Path(__file__).resolve().parents[1] / "assets/templates/cover-letter.html"
@@ -55,6 +55,7 @@ def build(source: Path, html_output: Path, pdf_output: Path, *, markdown: str | 
     contact = (f'{html.escape(values["LOCATION"])} · <a href="mailto:{email}">{email}</a> · '
                f'<a href="{website}">{website}</a>')
     document = TEMPLATE.read_text(encoding="utf-8")
+    body_markup = [f"<p>{_paragraph(paragraph)}</p>" for paragraph in body]
     fields = {
         "LANG": html.escape(language, quote=True),
         "TITLE": html.escape(title_override or f'Cover Letter — {values["SUBJECT"]}'),
@@ -64,7 +65,7 @@ def build(source: Path, html_output: Path, pdf_output: Path, *, markdown: str | 
         "RECIPIENT": _paragraph(values["RECIPIENT"]),
         "SUBJECT": html.escape(values["SUBJECT"]),
         "SALUTATION": _paragraph(salutation),
-        "BODY": "".join(f"<p>{_paragraph(paragraph)}</p>" for paragraph in body),
+        "BODY": "".join(body_markup),
         "SIGNOFF": _paragraph(signoff),
         "SIGNATURE": _paragraph(signature),
     }
@@ -93,9 +94,22 @@ def build(source: Path, html_output: Path, pdf_output: Path, *, markdown: str | 
         document = document.replace("</style>", extra_css + "\n</style>")
     html_output.parent.mkdir(parents=True, exist_ok=True)
     html_output.write_text(document, encoding="utf-8")
-    render_pdf(html_output, pdf_output)
+    HTML = _load_weasyprint()
+    rendered = HTML(filename=str(html_output), base_url=html_output.resolve().parent.as_uri()).render()
+    if len(rendered.pages) != 1:
+        marker = fields["BODY"]
+        for index, paragraph in enumerate(body_markup):
+            partial = document.replace(marker, "".join(body_markup[:index + 1]))
+            if len(HTML(string=partial, base_url=html_output.resolve().parent.as_uri()).render().pages) > 1:
+                offset = markdown.find(body[index])
+                line = markdown[:offset].count("\n") + 1 if offset >= 0 else "unknown"
+                raise ValueError(f"Cover-letter content overflows A4 at body paragraph on line {line}: {body[index][:70]}")
+        raise ValueError("Cover-letter content overflows A4 at the closing block")
+    pdf_output.parent.mkdir(parents=True, exist_ok=True)
+    rendered.write_pdf(str(pdf_output))
     with fitz.open(pdf_output) as pdf:
-        if len(pdf) != 1 or abs(pdf[0].rect.width - 595.28) > 1 or abs(pdf[0].rect.height - 841.89) > 1:
+        if abs(pdf[0].rect.width - 595.28) > 1 or abs(pdf[0].rect.height - 841.89) > 1:
+            pdf_output.unlink(missing_ok=True)
             raise ValueError("Cover-letter content does not fit its one-page A4 layout")
 
 
