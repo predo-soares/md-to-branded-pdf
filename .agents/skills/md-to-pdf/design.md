@@ -7,3 +7,4 @@ Each Template owns its layout contract and CSS. The approved résumé remains vi
 The PDF is rendered from saved HTML with WeasyPrint. Keep the generated HTML as the reviewable visual source, and check actual PDF pages before approving a layout.
 
 Global profile choices are limited to font, accent, and paper color. The initial choices are system UI or bundled Geist and six-digit hex colors. Document-level choices override the profile only for that build. The plain-document Template applies those choices through CSS variables; each later Template must define which profile values it accepts without weakening its layout contract.
+The proposal Template retains its existing Geist-based cover and numbered-section styling under default settings. A customized profile can change only its font, accent, and paper color; page geometry, section structure, and spacing stay under the proposal Template's control.

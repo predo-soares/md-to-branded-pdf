@@ -5,13 +5,11 @@ from __future__ import annotations
 import argparse
 import base64
 import html
-import os
-import platform
 import re
-import tempfile
 from pathlib import Path
 
 from markdown_it import MarkdownIt
+from render_html_pdf import _load_weasyprint
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -77,7 +75,7 @@ code { font-size: 0.9em; overflow-wrap: anywhere; }
     for key, value in sorted(values.items(), key=lambda item: -len(item[0])):
         style = style.replace(f"var({key})", value.strip())
     if "var(--" in style:
-        raise ValueError("Token CSS não definido")
+        raise ValueError("Undefined CSS token")
     return style
 
 
@@ -153,25 +151,53 @@ def render_section(number: int, title: str, body: str) -> str:
             f'<div class="section-body">{content}</div></section>')
 
 
+def styled_css(profile: dict[str, str] | None, override: bool) -> str:
+    style = css()
+    if not override or not profile:
+        return style
+    font = profile["font"]
+    if font.startswith("google:"):
+        font = "GoogleSelectedFont"
+        style += "\n" + profile["font_css"]
+    elif font.startswith("fontsource:"):
+        font = "FontsourceSelectedFont"
+        style += "\n" + profile["font_css"]
+    elif font not in {"system-ui", "Geist"}:
+        path = Path(font)
+        font = "UserSelectedFont"
+        style += f'\n@font-face {{ font-family: "{font}"; src: url("{path.as_uri()}"); }}'
+    style += (f'\n@page {{ background: {profile["paper"]}; }} '
+              f'html, body {{ background: {profile["paper"]}; }} '
+              f'body {{ font-family: "{font}", Arial, sans-serif; }} '
+              f'a, .section-number {{ color: {profile["accent"]}; }}')
+    return style
+
+
 def build(markdown_path: Path, html_path: Path, pdf_path: Path, *, kind: str | None = None,
           client: str | None = None, author: str | None = None, date: str | None = None,
-          footer_left: str | None = None, footer_right: str | None = None) -> None:
-    title, subtitle, meta, preamble, sections = parse(markdown_path.read_text(encoding="utf-8"))
+          footer_left: str | None = None, footer_right: str | None = None,
+          markdown: str | None = None, title_override: str | None = None,
+          language: str = "pt-BR", style_profile: dict[str, str] | None = None,
+          style_override: bool = False,
+          verified_image_hosts: set[str] | None = None) -> None:
+    markdown = markdown if markdown is not None else markdown_path.read_text(encoding="utf-8")
+    title, subtitle, meta, preamble, sections = parse(markdown)
     if not sections:
-        raise ValueError("Nenhuma seção numerada encontrada")
+        raise ValueError("Proposal requires at least one numbered section")
     rendered_sections = "\n".join(render_section(*section) for section in sections)
-    investment = re.search(r"\*\*Investimento total:\*\*\s*(R\$\s*[\d.,]+)", markdown_path.read_text(encoding="utf-8"))
+    investment = re.search(r"\*\*Investimento total:\*\*\s*(R\$\s*[\d.,]+)", markdown)
     fields = {
         "body_class": "internal" if kind else "proposal",
+        "document_language": html.escape(language, quote=True),
         "document_kind": html.escape(kind or title),
-        "document_title": html.escape(subtitle),
+        "document_title": html.escape(title_override or subtitle),
         "author": html.escape(author or meta.get("Proposta por", "")),
         "date": html.escape(date or meta.get("Data", "")),
         "client": html.escape(client or meta.get("Cliente", "")),
         "footer_left": html.escape(footer_left if footer_left is not None else ("Investimento: " + investment.group(1) if investment else "")),
         "footer_right": html.escape(footer_right if footer_right is not None else ("Validade: " + meta["Validade"] if "Validade" in meta else "")),
         "preamble": f'<div class="document-intro">{MARKDOWN.render(preamble)}</div>' if preamble else "",
-        "styles": css(),
+        "styles": styled_css(style_profile, style_override),
         "sections": rendered_sections,
     }
     document = TEMPLATE.read_text(encoding="utf-8")
@@ -180,30 +206,8 @@ def build(markdown_path: Path, html_path: Path, pdf_path: Path, *, kind: str | N
     html_path.parent.mkdir(parents=True, exist_ok=True)
     pdf_path.parent.mkdir(parents=True, exist_ok=True)
     html_path.write_text(document, encoding="utf-8")
-    if platform.system() == "Darwin":
-        import cffi
-        os.environ.setdefault("XDG_CACHE_HOME", str(Path(tempfile.gettempdir()) / "md-to-pdf-font-cache"))
-        names = {
-            "libgobject-2.0-0": "libgobject-2.0.dylib",
-            "libpango-1.0-0": "libpango-1.0.dylib",
-            "libharfbuzz-0": "libharfbuzz.dylib",
-            "libharfbuzz-subset-0": "libharfbuzz-subset.dylib",
-            "libfontconfig-1": "libfontconfig.dylib",
-            "libpangoft2-1.0-0": "libpangoft2-1.0.dylib",
-        }
-        original_dlopen = cffi.FFI.dlopen
-
-        def homebrew_dlopen(self, name, flags=0):
-            if name in names:
-                for directory in (Path("/opt/homebrew/lib"), Path("/usr/local/lib")):
-                    candidate = directory / names[name]
-                    if candidate.exists():
-                        return original_dlopen(self, str(candidate), flags)
-            return original_dlopen(self, name, flags)
-
-        cffi.FFI.dlopen = homebrew_dlopen
-    from weasyprint import HTML
-    HTML(string=document, base_url=str(markdown_path.parent)).write_pdf(str(pdf_path))
+    HTML = _load_weasyprint()
+    HTML(filename=str(html_path), base_url=str(markdown_path.parent.resolve())).write_pdf(str(pdf_path))
 
 
 if __name__ == "__main__":

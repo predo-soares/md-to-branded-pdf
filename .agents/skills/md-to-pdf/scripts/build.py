@@ -14,12 +14,12 @@ from fontsource_fonts import resolve as resolve_fontsource_font
 from style_profile import DEFAULT, FONTS, load as load_profile, onboard, validate as validate_profile
 
 SCRIPTS = Path(__file__).resolve().parent
-TEMPLATES = {"plain-document": "build-document.py"}
+TEMPLATES = {"plain-document": "build-document.py", "proposal": "build-proposal.py"}
 
 
 def load_builder(template: str):
     module_path = SCRIPTS / TEMPLATES[template]
-    spec = importlib.util.spec_from_file_location("md_to_pdf_plain_document", module_path)
+    spec = importlib.util.spec_from_file_location(f"md_to_pdf_{template.replace('-', '_')}", module_path)
     if spec is None or spec.loader is None:
         raise RuntimeError(f"Cannot load Template builder: {template}")
     module = importlib.util.module_from_spec(spec)
@@ -81,7 +81,7 @@ def main() -> None:
         parser.error("Choose a Template with --template or YAML frontmatter 'template'")
     if template not in TEMPLATES:
         parser.error(f"Unknown or unavailable Template: {template}")
-    language = metadata.get("lang", "en")
+    language = metadata.get("lang", "pt-BR" if template == "proposal" else "en")
     if not re.fullmatch(r"[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*", language):
         parser.error(f"Invalid document language: {language}")
     hosts = {host.lower() for host in args.verified_image_host}
@@ -89,8 +89,10 @@ def main() -> None:
         parser.error("--verified-image-host requires a hostname without a URL scheme or path")
     try:
         style_profile = load_profile()
+        saved_custom_profile = style_profile is not None and style_profile != DEFAULT
         if style_profile is None:
             style_profile = onboard() if sys.stdin.isatty() else DEFAULT.copy()
+            saved_custom_profile = style_profile != DEFAULT
         style_profile.update({key: metadata[key] for key in ("font", "accent", "paper") if key in metadata})
         style_profile.update({key: value for key, value in
                               (("font", args.font), ("accent", args.accent), ("paper", args.paper))
@@ -121,10 +123,14 @@ def main() -> None:
                 style_profile["font_css"] = resolve_fontsource_font(specifier, allow_download=allow)
     except (ValueError, OSError, PermissionError) as error:
         parser.error(str(error))
+    style_override = (saved_custom_profile or
+                      any(key in metadata for key in ("font", "accent", "paper")) or
+                      any(value is not None for value in (args.font, args.accent, args.paper)))
     try:
         load_builder(template)(source, html_output, pdf_output, markdown=markdown,
                                title_override=metadata.get("title"), language=language,
-                               style_profile=style_profile, verified_image_hosts=hosts)
+                               style_profile=style_profile, style_override=style_override,
+                               verified_image_hosts=hosts)
     except (ValueError, OSError) as error:
         parser.error(str(error))
 

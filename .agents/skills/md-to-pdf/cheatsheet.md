@@ -6,6 +6,8 @@ To build an ordinary A4 document:
 python3 .agents/skills/md-to-pdf/scripts/build.py input.md --template plain-document --html output.html --pdf output.pdf
 ```
 
+To build a numbered proposal with its cover, sections, and tables, use `--template proposal` with the same command. The proposal keeps its existing Geist-based visual defaults unless you explicitly customize the global profile or this document's `font`, `accent`, or `paper` values.
+
 Choose the Template explicitly with `--template` or YAML frontmatter:
 
 ```yaml

@@ -19,6 +19,7 @@ GEIST = Path(__file__).resolve().parents[1] / "assets/geist-latin.woff2"
 def build(source: Path, html_output: Path, pdf_output: Path, *, markdown: str | None = None,
           title_override: str | None = None, language: str = "en",
           style_profile: dict[str, str] | None = None,
+          style_override: bool = False,
           verified_image_hosts: set[str] | None = None) -> None:
     markdown = markdown if markdown is not None else source.read_text(encoding="utf-8")
     if not markdown.strip():
