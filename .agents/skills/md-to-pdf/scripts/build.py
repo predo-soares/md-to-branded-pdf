@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import importlib.util
+import json
 import re
 import sys
 from pathlib import Path
@@ -16,8 +17,10 @@ from style_profile import DEFAULT, FONTS, load as load_profile, onboard, validat
 SCRIPTS = Path(__file__).resolve().parent
 TEMPLATES = {"plain-document": "build-document.py", "proposal": "build-proposal.py",
              "resume": "build-resume.py", "cover-letter": "render-cover-letter.py",
-             "one-pager": "build-one-pager.py", "long-document": "build-document.py"}
+             "one-pager": "build-one-pager.py", "long-document": "build-document.py",
+             "portfolio": "build-document.py"}
 LONG_DOCUMENT_CSS = SCRIPTS.parent / "assets/long-document.css"
+PORTFOLIO_CSS = SCRIPTS.parent / "assets/portfolio.css"
 
 
 def load_builder(template: str):
@@ -141,11 +144,19 @@ def main() -> None:
                       any(key in metadata for key in ("font", "accent", "paper")) or
                       any(value is not None for value in (args.font, args.accent, args.paper)))
     try:
-        options = {"css_path": LONG_DOCUMENT_CSS, "figure_images": True} if template == "long-document" else {}
+        options = ({"css_path": LONG_DOCUMENT_CSS, "figure_images": True} if template == "long-document" else
+                   {"css_path": PORTFOLIO_CSS, "figure_images": True} if template == "portfolio" else {})
+        if template == "portfolio":
+            from portfolio_content import parse as parse_portfolio
+            content = parse_portfolio(markdown)
         load_builder(template)(source, html_output, pdf_output, markdown=markdown,
                                title_override=metadata.get("title"), language=language,
                                style_profile=style_profile, style_override=style_override,
                                verified_image_hosts=hosts, **options)
+        if template == "portfolio":
+            json_output = html_output.with_suffix(".content.json")
+            json_output.write_text(json.dumps(content, ensure_ascii=False, indent=2) + "\n",
+                                   encoding="utf-8")
     except (ValueError, OSError) as error:
         parser.error(str(error))
 
