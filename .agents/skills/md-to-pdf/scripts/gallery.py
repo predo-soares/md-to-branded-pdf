@@ -106,6 +106,17 @@ def generate(output: Path) -> dict:
             lines.append(f"Failed at `{entry['step']}`: {entry['error']}")
         lines.append("")
     (output / "index.md").write_text("\n".join(lines), encoding="utf-8")
+    review_lines = ["# Human release review", "",
+                    "Inspect every page image and PDF in `index.md` before marking a Template accepted.",
+                    "Automated generation and verification do not approve visual quality.", "",
+                    "| Template | Pages | Decision | Defects or notes |",
+                    "| --- | ---: | --- | --- |"]
+    review_lines.extend(f"| {entry['template']} | {entry['expected']['pages']} | Pending | |"
+                        for entry in entries)
+    review_lines.extend(["", "## Release decision", "", "- [ ] Every Template has a recorded human decision.",
+                         "- [ ] All defects are fixed and the affected PDFs are regenerated and reviewed.",
+                         "- [ ] Public release is explicitly approved by the owner.", ""])
+    (output / "human-review.md").write_text("\n".join(review_lines), encoding="utf-8")
     return manifest
 
 

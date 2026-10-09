@@ -31,6 +31,9 @@ class GalleryTests(unittest.TestCase):
                              *entry["files"]["page_images"]):
                     self.assertTrue((output / path).is_file(), path)
             self.assertIn("[PDF]", (output / "index.md").read_text())
+            review = (output / "human-review.md").read_text()
+            self.assertEqual(review.count("| Pending |"), 10)
+            self.assertIn("Public release is explicitly approved", review)
 
 
 if __name__ == "__main__":
