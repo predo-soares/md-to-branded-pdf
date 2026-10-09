@@ -1,0 +1,17 @@
+:root { --paper: #fff; --ink: #18212b; --muted: #52606c; --accent: #245a7a; --font-body: system-ui, sans-serif; }
+@page { size: 320mm 180mm; margin: 0; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); }
+body { font: 16pt/1.35 var(--font-body); }
+.slide { box-sizing: border-box; width: 320mm; min-height: 180mm; padding: 18mm 24mm; break-after: page; }
+.slide:last-child { break-after: auto; }
+.slide h1 { font-size: 34pt; line-height: 1.1; margin: 0 0 12mm; max-width: 265mm; }
+.slide h2 { font-size: 28pt; line-height: 1.13; margin: 0 0 12mm; max-width: 265mm; }
+.slide p { margin: 0 0 8mm; max-width: 260mm; }
+.slide ul, .slide ol { margin: 0 0 8mm; padding-left: 9mm; }
+.slide li { margin: 0 0 5mm; }
+.slide a { color: var(--accent); }
+.slide pre { font-size: 12pt; white-space: pre-wrap; }
+.slide img { max-width: 100%; max-height: 110mm; }
+.slide.cover, .slide.closing { display: flex; flex-direction: column; justify-content: center; }
+.slide.cover h1, .slide.closing h2 { font-size: 42pt; }
+.slide.assertion { border-top: 4mm solid var(--accent); padding-top: 20mm; }

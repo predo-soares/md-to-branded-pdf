@@ -19,7 +19,7 @@ TEMPLATES = {"plain-document": "build-document.py", "proposal": "build-proposal.
              "resume": "build-resume.py", "cover-letter": "render-cover-letter.py",
              "one-pager": "build-one-pager.py", "long-document": "build-document.py",
              "portfolio": "build-document.py", "analytical-report": "build-document.py",
-             "changelog": "build-document.py"}
+             "changelog": "build-document.py", "pitch-deck": "build-deck.py"}
 LONG_DOCUMENT_CSS = SCRIPTS.parent / "assets/long-document.css"
 PORTFOLIO_CSS = SCRIPTS.parent / "assets/portfolio.css"
 REPORT_CSS = SCRIPTS.parent / "assets/report.css"
