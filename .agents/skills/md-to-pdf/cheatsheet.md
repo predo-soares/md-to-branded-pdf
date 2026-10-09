@@ -44,3 +44,5 @@ For Fontsource, use `--font 'fontsource:family-id'` or pin a version with `--fon
 Use standard Markdown headings, paragraphs, lists, links, fenced code, and tables. Start with a `#` heading to set the PDF title. See `design.md` for style rules; this cheatsheet is the short usage reference.
 
 Add a local image with descriptive alt text, such as `![Revenue by quarter](figures/revenue.png)`. Use meaningful link labels, such as `[Project documentation](https://example.org/docs)`. For a remote image from an official source you have verified, pass its exact HTTPS hostname with `--verified-image-host example.org`. Other remote image hosts are rejected.
+
+For an optional PDF inspection, run `python3 .agents/skills/md-to-pdf/scripts/verify.py output.pdf --output review/`. It writes a JSON report, a checklist, and `page-001.png`, `page-002.png`, and so on. Inspect every page image and approve the visuals yourself; the report does not approve them automatically.
