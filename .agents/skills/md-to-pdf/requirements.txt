@@ -1,2 +1,4 @@
 jsonschema>=4.20,<5
 WeasyPrint>=66,<67
+markdown-it-py>=3,<5
+reportlab>=4,<5

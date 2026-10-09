@@ -1,0 +1,18 @@
+:root {
+  --paper: #ffffff;
+  --ink: #1d1d1b;
+  --muted: #66645f;
+  --soft: #f1f1f1;
+  --accent: #383733;
+  --font-family: "Geist", Arial, sans-serif;
+  --font-size-body: 14px;
+  --font-size-title: 23pt;
+  --cover-title-width: 118mm;
+  --cover-title-letter-spacing: -0.65pt;
+  --font-size-section: 15pt;
+  --font-size-small: 8.5pt;
+  --line-height-body: 1.5;
+  --space-section: 24pt;
+  --space-paragraph: 8pt;
+  --page-margin: 25.4mm;
+}

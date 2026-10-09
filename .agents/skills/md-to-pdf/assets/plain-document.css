@@ -1,0 +1,22 @@
+:root {
+  --paper: #fff;
+  --ink: #1c1c1c;
+  --muted: #555;
+  --rule: #ccc;
+  --code-background: #f3f3f3;
+  --font-body: system-ui, sans-serif;
+}
+
+@page { size: A4; margin: 20mm; }
+body { font: 11pt/1.5 var(--font-body); color: var(--ink); background: var(--paper); }
+h1, h2, h3 { line-height: 1.2; break-after: avoid; }
+h1 { font-size: 22pt; }
+h2 { font-size: 15pt; margin-top: 20pt; }
+h3 { font-size: 12pt; }
+p, li { overflow-wrap: anywhere; }
+table { width: 100%; border-collapse: collapse; }
+th, td { border-bottom: 1px solid var(--rule); padding: 5pt; text-align: left; vertical-align: top; }
+tr, img, pre { break-inside: avoid; }
+pre { white-space: pre-wrap; overflow-wrap: anywhere; padding: 8pt; background: var(--code-background); }
+img { max-width: 100%; }
+a { color: inherit; }

@@ -11,8 +11,8 @@ This repository collects skills and small tools I create to research vacancies, 
 
 ## Career-document workflow
 
-- For résumé and cover-letter work, use the project-owned `.agents/skills/resume-studio/SKILL.md` and its templates, scripts, and renderers.
+- For Markdown-to-PDF work, including résumés and cover letters, use the project-owned `.agents/skills/md-to-pdf/SKILL.md` and its template routing, scripts, and renderers. Ask the user to choose a template when the context does not make the choice clear.
 - Do not invoke the Kami skill or use its templates, styling, or scripts. Kami was a reference when creating our own workflow; it is not a dependency or execution tool for this repository.
 - Treat source résumés as the factual authority. Do not invent metrics, dates, responsibilities, ownership, or credentials.
 - Keep master résumés at the workspace root and vacancy-tailored Markdown in `resumes/targeted/`; these are private local inputs and are intentionally excluded from Git.
-- The approved résumé design is documented in the Resume Studio skill. Keep its canonical HTML template as the sole visual source and render PDFs from the saved HTML.
+- The approved résumé design is documented in the md-to-pdf skill. Keep its canonical HTML template as the sole visual source and render résumé PDFs from the saved HTML.
