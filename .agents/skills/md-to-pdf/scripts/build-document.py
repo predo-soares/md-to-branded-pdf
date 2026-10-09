@@ -8,6 +8,7 @@ from pathlib import Path
 
 from markdown_it import MarkdownIt
 
+from media_validation import guarded_fetcher, validate_and_rewrite
 from render_html_pdf import _load_weasyprint
 
 
@@ -17,12 +18,17 @@ GEIST = Path(__file__).resolve().parents[1] / "assets/geist-latin.woff2"
 
 def build(source: Path, html_output: Path, pdf_output: Path, *, markdown: str | None = None,
           title_override: str | None = None, language: str = "en",
-          style_profile: dict[str, str] | None = None) -> None:
+          style_profile: dict[str, str] | None = None,
+          verified_image_hosts: set[str] | None = None) -> None:
     markdown = markdown if markdown is not None else source.read_text(encoding="utf-8")
     if not markdown.strip():
         raise ValueError("Markdown source is empty")
     title = title_override or next((line[2:].strip() for line in markdown.splitlines() if line.startswith("# ")), source.stem)
-    body = MarkdownIt("commonmark", {"breaks": True}).enable("table").render(markdown)
+    parser = MarkdownIt("commonmark", {"breaks": True, "html": False}).enable("table")
+    tokens = parser.parse(markdown)
+    verified_image_hosts = verified_image_hosts or set()
+    validate_and_rewrite(tokens, source, verified_image_hosts)
+    body = parser.renderer.render(tokens, parser.options, {})
     styles = CSS.read_text(encoding="utf-8")
     if style_profile:
         font = style_profile["font"]
@@ -47,7 +53,8 @@ def build(source: Path, html_output: Path, pdf_output: Path, *, markdown: str | 
     pdf_output.parent.mkdir(parents=True, exist_ok=True)
     html_output.write_text(document, encoding="utf-8")
     HTML = _load_weasyprint()
-    HTML(filename=str(html_output), base_url=str(source.parent.resolve())).write_pdf(str(pdf_output))
+    HTML(filename=str(html_output), base_url=str(source.parent.resolve()),
+         url_fetcher=guarded_fetcher(verified_image_hosts)).write_pdf(str(pdf_output))
 
 
 if __name__ == "__main__":

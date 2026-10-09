@@ -22,7 +22,7 @@ class StyleProfileTests(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
         self.source = self.root / "source.md"
-        self.source.write_text("# Synthetic PDF\n\nA [link](https://example.org).\n", encoding="utf-8")
+        self.source.write_text("# Synthetic PDF\n\nRead the [project documentation](https://example.org).\n", encoding="utf-8")
         self.config = self.root / "config"
 
     def build(self, *extra: str) -> subprocess.CompletedProcess[str]:

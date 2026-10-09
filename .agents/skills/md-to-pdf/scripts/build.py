@@ -56,6 +56,8 @@ def main() -> None:
                         help="Explicitly allow a new Google Fonts or Fontsource download")
     parser.add_argument("--accent", help="Document accent color (#RRGGBB)")
     parser.add_argument("--paper", help="Document paper color (#RRGGBB)")
+    parser.add_argument("--verified-image-host", action="append", default=[], metavar="HOST",
+                        help="Official HTTPS host verified for remote Markdown images")
     parser.add_argument("--html", required=True, type=Path, help="Saved HTML output")
     parser.add_argument("--pdf", required=True, type=Path, help="PDF output")
     args = parser.parse_args()
@@ -82,6 +84,9 @@ def main() -> None:
     language = metadata.get("lang", "en")
     if not re.fullmatch(r"[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*", language):
         parser.error(f"Invalid document language: {language}")
+    hosts = {host.lower() for host in args.verified_image_host}
+    if any(not re.fullmatch(r"[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+", host) for host in hosts):
+        parser.error("--verified-image-host requires a hostname without a URL scheme or path")
     try:
         style_profile = load_profile()
         if style_profile is None:
@@ -116,9 +121,12 @@ def main() -> None:
                 style_profile["font_css"] = resolve_fontsource_font(specifier, allow_download=allow)
     except (ValueError, OSError, PermissionError) as error:
         parser.error(str(error))
-    load_builder(template)(source, html_output, pdf_output, markdown=markdown,
-                           title_override=metadata.get("title"), language=language,
-                           style_profile=style_profile)
+    try:
+        load_builder(template)(source, html_output, pdf_output, markdown=markdown,
+                               title_override=metadata.get("title"), language=language,
+                               style_profile=style_profile, verified_image_hosts=hosts)
+    except (ValueError, OSError) as error:
+        parser.error(str(error))
 
 
 if __name__ == "__main__":
