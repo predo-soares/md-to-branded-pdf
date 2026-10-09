@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Analytical report content",
+  "type": "object",
+  "required": ["title", "thesis", "evidence", "analysis", "risks", "conclusion"],
+  "additionalProperties": false,
+  "properties": {
+    "title": {"type": "string", "minLength": 1},
+    "thesis": {"type": "string", "minLength": 1},
+    "evidence": {"type": "string", "minLength": 1},
+    "analysis": {"type": "string", "minLength": 1},
+    "risks": {"type": "string", "minLength": 1},
+    "financial_context": {"type": "string", "minLength": 1},
+    "conclusion": {"type": "string", "minLength": 1}
+  }
+}
