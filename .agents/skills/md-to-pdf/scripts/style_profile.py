@@ -20,7 +20,11 @@ def profile_path() -> Path:
 def validate(profile: dict[str, str]) -> dict[str, str]:
     if set(profile) != set(DEFAULT):
         raise ValueError("Style profile must define font, accent, and paper")
-    if profile["font"] not in FONTS:
+    if profile["font"].startswith("google:"):
+        from google_fonts import FAMILY
+        if not FAMILY.fullmatch(profile["font"][7:]):
+            raise ValueError(f"Invalid Google Fonts family: {profile['font'][7:]}")
+    elif profile["font"] not in FONTS:
         font = Path(profile["font"]).expanduser()
         if font.suffix.lower() not in FONT_EXTENSIONS:
             raise ValueError(f"Unsupported font format: {font.suffix or '(none)'}")
@@ -60,13 +64,13 @@ def onboard() -> dict[str, str]:
         profile = DEFAULT.copy()
     elif choice == "custom":
         profile = {
-            "font": input("Font [system-ui/Geist/local file path]: ").strip() or DEFAULT["font"],
+            "font": input("Font [system-ui/Geist/local path/google:Family Name]: ").strip() or DEFAULT["font"],
             "accent": input("Accent color [#RRGGBB]: ").strip() or DEFAULT["accent"],
             "paper": input("Paper color [#RRGGBB]: ").strip() or DEFAULT["paper"],
         }
     else:
         raise ValueError("Choose 'default' or 'custom'")
-    if profile["font"] not in FONTS:
+    if profile["font"] not in FONTS and not profile["font"].startswith("google:"):
         profile["font"] = str(Path(profile["font"]).expanduser().resolve())
     save(profile)
     return profile

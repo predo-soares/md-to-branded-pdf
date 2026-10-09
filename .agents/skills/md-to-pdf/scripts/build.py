@@ -9,6 +9,7 @@ import sys
 from pathlib import Path
 
 import yaml
+from google_fonts import resolve as resolve_google_font
 from style_profile import DEFAULT, FONTS, load as load_profile, onboard, validate as validate_profile
 
 SCRIPTS = Path(__file__).resolve().parent
@@ -50,6 +51,8 @@ def main() -> None:
     parser.add_argument("markdown", type=Path, help="Markdown source file")
     parser.add_argument("--template", choices=sorted(TEMPLATES))
     parser.add_argument("--font", help="Document font; overrides global profile")
+    parser.add_argument("--allow-font-download", action="store_true",
+                        help="Explicitly allow a new Google Fonts download")
     parser.add_argument("--accent", help="Document accent color (#RRGGBB)")
     parser.add_argument("--paper", help="Document paper color (#RRGGBB)")
     parser.add_argument("--html", required=True, type=Path, help="Saved HTML output")
@@ -86,13 +89,22 @@ def main() -> None:
         style_profile.update({key: value for key, value in
                               (("font", args.font), ("accent", args.accent), ("paper", args.paper))
                               if value is not None})
-        if style_profile["font"] not in FONTS:
+        if style_profile["font"] not in FONTS and not style_profile["font"].startswith("google:"):
             font_path = Path(style_profile["font"]).expanduser()
             if not font_path.is_absolute():
                 font_path = ((Path.cwd() if args.font is not None else source.parent) / font_path).resolve()
             style_profile["font"] = str(font_path)
         validate_profile(style_profile)
-    except (ValueError, OSError) as error:
+        if style_profile["font"].startswith("google:"):
+            family = style_profile["font"][7:]
+            allow = args.allow_font_download
+            from google_fonts import cache_root
+            if not allow and sys.stdin.isatty():
+                key = __import__("hashlib").sha256(family.casefold().encode()).hexdigest()[:16]
+                if not (cache_root() / key / "manifest.json").exists():
+                    allow = input(f"Download Google Fonts family '{family}' for this PDF? [y/N]: ").strip().lower() in {"y", "yes"}
+            style_profile["font_css"] = resolve_google_font(family, allow_download=allow)
+    except (ValueError, OSError, PermissionError) as error:
         parser.error(str(error))
     load_builder(template)(source, html_output, pdf_output, markdown=markdown,
                            title_override=metadata.get("title"), language=language,
