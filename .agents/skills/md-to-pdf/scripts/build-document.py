@@ -14,15 +14,16 @@ from render_html_pdf import _load_weasyprint
 CSS = Path(__file__).resolve().parents[1] / "assets/plain-document.css"
 
 
-def build(source: Path, html_output: Path, pdf_output: Path) -> None:
-    markdown = source.read_text(encoding="utf-8")
+def build(source: Path, html_output: Path, pdf_output: Path, *, markdown: str | None = None,
+          title_override: str | None = None, language: str = "en") -> None:
+    markdown = markdown if markdown is not None else source.read_text(encoding="utf-8")
     if not markdown.strip():
         raise ValueError("Markdown source is empty")
-    title = next((line[2:].strip() for line in markdown.splitlines() if line.startswith("# ")), source.stem)
+    title = title_override or next((line[2:].strip() for line in markdown.splitlines() if line.startswith("# ")), source.stem)
     body = MarkdownIt("commonmark", {"breaks": True}).enable("table").render(markdown)
     styles = CSS.read_text(encoding="utf-8")
     document = f'''<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><title>{html.escape(title)}</title>
+<html lang="{html.escape(language, quote=True)}"><head><meta charset="utf-8"><title>{html.escape(title)}</title>
 <style>{styles}</style></head><body>{body}</body></html>'''
     html_output.parent.mkdir(parents=True, exist_ok=True)
     pdf_output.parent.mkdir(parents=True, exist_ok=True)

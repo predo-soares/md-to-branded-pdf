@@ -5,7 +5,7 @@ description: Create PDFs from Markdown using a context-appropriate project templ
 
 # Markdown to PDF
 
-Choose the template from the user's request, source content, and project context. When multiple templates plausibly fit and the user has not chosen, ask the user which one to use before rendering. If no template fits, ask whether to adapt one or create a reusable new template. Do not silently force an ambiguous document into the proposal layout.
+Choose the template from the user's request, source content, and project context. An explicit user choice takes precedence over inference. When multiple templates plausibly fit and the user has not chosen, ask the user which one to use before rendering. If no template fits, ask whether to adapt one or create a reusable new template. Do not silently force an ambiguous document into the proposal layout. See `references/template-routing.md` for selection examples.
 
 ## Template routing
 
@@ -18,7 +18,7 @@ Choose the template from the user's request, source content, and project context
 
 The proposal renderer requires at least one `##` section and supports `--kind`, `--client`, `--author`, `--date`, `--footer-left`, and `--footer-right`. Its `assets/document.html` and `assets/tokens.css` control the layout. The first unnumbered `##` immediately after the `#` title is a cover subtitle. Later `##` headings become numbered sections. Proposal-specific investment and work-stage tables render when those headings are present. Do not use this layout as a generic default.
 
-The unified `scripts/build.py` command currently supports `plain-document`; other existing renderers will join it as their Templates are migrated. Require `--template` even for an ordinary document. Use `cheatsheet.md` for user-facing usage and `design.md` for style rules. `assets/plain-document.css` contains the executable plain-document defaults.
+The unified `scripts/build.py` command currently supports `plain-document`; other existing renderers will join it as their Templates are migrated. Direct builds require `--template` or YAML frontmatter `template`. Matching declarations are accepted; conflicting or unknown selections fail. Use `cheatsheet.md` for user-facing usage and `design.md` for style rules. `assets/plain-document.css` contains the executable plain-document defaults.
 
 ## Résumés
 
