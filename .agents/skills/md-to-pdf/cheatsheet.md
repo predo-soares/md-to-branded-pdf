@@ -10,6 +10,7 @@ To build a numbered proposal with its cover, sections, and tables, use `--templa
 To build a résumé with the approved two-page A4 layout, use `--template resume`. This saves validated `.content.json` next to the HTML. The résumé ignores your global Style profile and rejects document style overrides.
 To build a cover letter, use `--template cover-letter`. The Markdown starts with `Dear ` and ends with a sign-off and signature. Set the `CAREER_NAME`, `CAREER_LOCATION`, `CAREER_EMAIL`, `CAREER_WEBSITE`, `CAREER_RECIPIENT`, and `CAREER_SUBJECT` environment variables locally; `CAREER_DATE` is optional. The saved HTML is the PDF's visual source.
 To build a one-pager, use `--template one-pager`. Start with `# Title`, then a short paragraph stating the central message. Add sections and only the metrics you actually have. The builder reports the first overflowing block when content does not fit one A4 page.
+To build a multi-chapter document, use `--template long-document`. It paginates naturally on A4. Put an italic caption immediately after a standalone Markdown image to keep them together as a figure; headings and table rows avoid awkward splits where possible.
 
 Choose the Template explicitly with `--template` or YAML frontmatter:
 

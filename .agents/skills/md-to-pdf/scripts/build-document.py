@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import html
+import re
 from pathlib import Path
 
 from markdown_it import MarkdownIt
@@ -20,7 +21,8 @@ def build(source: Path, html_output: Path, pdf_output: Path, *, markdown: str | 
           title_override: str | None = None, language: str = "en",
           style_profile: dict[str, str] | None = None,
           style_override: bool = False,
-          verified_image_hosts: set[str] | None = None) -> None:
+          verified_image_hosts: set[str] | None = None,
+          css_path: Path | None = None, figure_images: bool = False) -> None:
     markdown = markdown if markdown is not None else source.read_text(encoding="utf-8")
     if not markdown.strip():
         raise ValueError("Markdown source is empty")
@@ -30,7 +32,20 @@ def build(source: Path, html_output: Path, pdf_output: Path, *, markdown: str | 
     verified_image_hosts = verified_image_hosts or set()
     validate_and_rewrite(tokens, source, verified_image_hosts)
     body = parser.renderer.render(tokens, parser.options, {})
-    styles = CSS.read_text(encoding="utf-8")
+    if figure_images:
+        body = re.sub(
+            r"<p>(<img\b[^>]+/>)<br\s*/?>\s*<em>(.*?)</em></p>",
+            lambda match: f"<figure>{match.group(1)}<figcaption>{match.group(2)}</figcaption></figure>",
+            body,
+        )
+        body = re.sub(
+            r"<p>(<img\b[^>]+/>)</p>\s*(?:<p><em>(.*?)</em></p>)?",
+            lambda match: (f"<figure>{match.group(1)}"
+                           + (f"<figcaption>{match.group(2)}</figcaption>" if match.group(2) else "")
+                           + "</figure>"),
+            body,
+        )
+    styles = (css_path or CSS).read_text(encoding="utf-8")
     if style_profile:
         font = style_profile["font"]
         if font == "Geist":
