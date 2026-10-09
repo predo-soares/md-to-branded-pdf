@@ -106,15 +106,95 @@ def _flowchart(data: dict) -> str:
     return "".join(parts)
 
 
+def _quadrant(data: dict) -> str:
+    items = data.get("items")
+    if not isinstance(items, list) or not 1 <= len(items) <= 8:
+        raise ValueError("Quadrant needs 1–8 items")
+    x_label = html.escape(_text(data.get("x_label"), "x axis", 24))
+    y_label = html.escape(_text(data.get("y_label"), "y axis", 24))
+    parts = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 410" role="img">',
+             '<rect x="95" y="25" width="610" height="310" fill="#f2f6f8"/>',
+             '<line x1="400" y1="25" x2="400" y2="335" stroke="#8695a1"/>',
+             '<line x1="95" y1="180" x2="705" y2="180" stroke="#8695a1"/>',
+             f'<text x="400" y="385" text-anchor="middle" font-size="16" fill="#18212b">{x_label} (low to high)</text>',
+             f'<text x="95" y="18" font-size="16" fill="#18212b">{y_label} (low to high)</text>']
+    cells = set()
+    for item in items:
+        if not isinstance(item, dict):
+            raise ValueError("Quadrant item must be an object")
+        label = html.escape(_text(item.get("label"), "item label", 20))
+        x, y = item.get("x"), item.get("y")
+        if any(isinstance(v, bool) or not isinstance(v, (int, float)) or not 0 <= v <= 1 for v in (x, y)):
+            raise ValueError("Quadrant x and y must be numbers from 0 to 1")
+        cell = (round(x * 6), round(y * 4))
+        if cell in cells:
+            raise ValueError("Quadrant items are too close; adjust their coordinates")
+        cells.add(cell)
+        px, py = 95 + 610 * x, 335 - 310 * y
+        parts.append(f'<circle cx="{px:.1f}" cy="{py:.1f}" r="6" fill="#245a7a"/>')
+        parts.append(f'<text x="{px:.1f}" y="{py - 10:.1f}" text-anchor="middle" font-size="14" fill="#18212b">{label}</text>')
+    return "".join(parts) + '</svg>'
+
+
+def _layer_stack(data: dict) -> str:
+    layers = data.get("layers")
+    if not isinstance(layers, list) or not 2 <= len(layers) <= 6:
+        raise ValueError("Layer stack needs 2–6 layers")
+    height = 55 + 72 * len(layers)
+    parts = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 {height}" role="img">']
+    for index, layer in enumerate(layers):
+        if not isinstance(layer, dict):
+            raise ValueError("Layer must be an object")
+        label = html.escape(_text(layer.get("label"), "layer label", 32))
+        detail = html.escape(_text(layer.get("detail"), "layer detail", 55))
+        y = 25 + index * 72
+        parts.append(f'<rect x="95" y="{y}" width="610" height="58" rx="7" fill="{("#e5eff2" if index % 2 == 0 else "#f2f6f8")}" stroke="#245a7a"/>')
+        parts.append(f'<text x="115" y="{y + 24}" font-size="17" font-weight="bold" fill="#18212b">{label}</text>')
+        parts.append(f'<text x="115" y="{y + 44}" font-size="13" fill="#52606c">{detail}</text>')
+    return "".join(parts) + '</svg>'
+
+
+def _swimlane(data: dict) -> str:
+    lanes = data.get("lanes")
+    steps = data.get("steps")
+    if not isinstance(lanes, list) or not 2 <= len(lanes) <= 4 or not isinstance(steps, list) or not 2 <= len(steps) <= 6:
+        raise ValueError("Swimlane needs 2–4 lanes and 2–6 steps")
+    lane_names = [_text(lane, "lane", 22) for lane in lanes]
+    if len(set(lane_names)) != len(lane_names):
+        raise ValueError("Swimlane lanes must be unique")
+    height = 50 + 100 * len(lanes)
+    parts = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 {height}" role="img">']
+    for index, lane in enumerate(lane_names):
+        y = 25 + index * 100
+        parts.append(f'<rect x="25" y="{y}" width="750" height="90" fill="{("#f2f6f8" if index % 2 == 0 else "#ffffff")}" stroke="#c6d1d6"/>')
+        parts.append(f'<text x="38" y="{y + 48}" font-size="15" fill="#18212b">{html.escape(lane)}</text>')
+    for index, step in enumerate(steps):
+        if not isinstance(step, dict) or step.get("lane") not in lane_names:
+            raise ValueError("Swimlane step must name a known lane")
+        label = html.escape(_text(step.get("label"), "step label", 20))
+        x = 200 + index * 530 / max(1, len(steps) - 1)
+        y = 25 + lane_names.index(step["lane"]) * 100 + 45
+        parts.append(f'<rect x="{x - 38:.1f}" y="{y - 23}" width="76" height="46" rx="6" fill="#e5eff2" stroke="#245a7a"/>')
+        parts.append(f'<text x="{x:.1f}" y="{y + 5}" text-anchor="middle" font-size="12" fill="#18212b">{label}</text>')
+        if index:
+            prev = steps[index - 1]
+            py = 25 + lane_names.index(prev["lane"]) * 100 + 45
+            px = 200 + (index - 1) * 530 / max(1, len(steps) - 1)
+            parts.append(f'<line x1="{px + 39:.1f}" y1="{py:.1f}" x2="{x - 39:.1f}" y2="{y:.1f}" stroke="#245a7a" stroke-width="2"/>')
+    return "".join(parts) + '</svg>'
+
+
 def render(raw: str, font_family: str = "Geist") -> str:
     try:
         data = json.loads(raw)
     except json.JSONDecodeError as error:
         raise ValueError(f"Invalid diagram JSON: {error.msg}") from error
-    if not isinstance(data, dict) or data.get("type") not in {"timeline", "flowchart"}:
-        raise ValueError("Diagram type must be timeline or flowchart")
+    renderers = {"timeline": _timeline, "flowchart": _flowchart, "quadrant": _quadrant,
+                 "layer-stack": _layer_stack, "swimlane": _swimlane}
+    if not isinstance(data, dict) or data.get("type") not in renderers:
+        raise ValueError("Diagram type must be timeline, flowchart, quadrant, layer-stack, or swimlane")
     title = html.escape(_text(data.get("title"), "title", 100))
-    svg = _timeline(data) if data["type"] == "timeline" else _flowchart(data)
+    svg = renderers[data["type"]](data)
     svg = svg.replace("<text ", f'<text font-family="{html.escape(font_family, quote=True)}" ')
     return f'<figure class="generated-diagram {data["type"]}-diagram" aria-label="{title}"><figcaption>{title}</figcaption>{svg}</figure>'
 

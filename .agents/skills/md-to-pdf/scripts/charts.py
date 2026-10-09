@@ -19,8 +19,8 @@ def _parse(raw: str) -> dict:
         chart = json.loads(raw)
     except json.JSONDecodeError as error:
         raise ValueError(f"Invalid chart JSON: {error.msg}") from error
-    if not isinstance(chart, dict) or chart.get("type") not in {"bar", "line", "metric"}:
-        raise ValueError("Chart type must be bar, line, or metric")
+    if not isinstance(chart, dict) or chart.get("type") not in {"bar", "line", "metric", "donut", "waterfall"}:
+        raise ValueError("Chart type must be bar, line, metric, donut, or waterfall")
     if not isinstance(chart.get("title"), str) or not chart["title"].strip():
         raise ValueError("Chart title must be a non-empty string")
     data = chart.get("data")
@@ -31,11 +31,18 @@ def _parse(raw: str) -> dict:
     for item in data:
         if not isinstance(item, dict) or not isinstance(item.get("label"), str) or not item["label"].strip():
             raise ValueError("Each chart item needs a non-empty label")
-        _number(item.get("value"))
+        if chart["type"] == "waterfall":
+            value = item.get("value")
+            if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
+                raise ValueError("Waterfall values must be finite numbers")
+        else:
+            _number(item.get("value"))
     if len({item["label"] for item in data}) != len(data):
         raise ValueError("Chart labels must be unique")
     if "unit" in chart and not isinstance(chart["unit"], str):
         raise ValueError("Chart unit must be a string")
+    if chart["type"] == "donut" and sum(item["value"] for item in data) <= 0:
+        raise ValueError("Donut chart total must be positive")
     return chart
 
 
@@ -49,6 +56,46 @@ def render(raw: str, font_family: str = "Geist") -> str:
         items = "".join(f'<div class="metric"><strong>{html.escape(_number(item["value"]))}{unit}</strong>'
                         f'<span>{html.escape(item["label"])}</span></div>' for item in data)
         return f'<figure class="generated-chart metric-chart" role="img" aria-label="{title}"><figcaption>{title}</figcaption><div class="metrics">{items}</div></figure>'
+    if kind == "donut":
+        total = sum(item["value"] for item in data)
+        palette = ("#245a7a", "#4c8ca3", "#78aeb2", "#a4c7c4", "#d0dcce", "#8b9ca4", "#536c7c", "#b6cbd0", "#6b908f", "#d2e4e2", "#788c99", "#a9b8b2")
+        parts = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 360" role="img">']
+        offset = 0.0
+        for index, item in enumerate(data):
+            fraction = item["value"] / total
+            if fraction:
+                parts.append(f'<circle cx="205" cy="180" r="100" fill="none" stroke="{palette[index]}" stroke-width="56" stroke-dasharray="{fraction * 628.319:.3f} 628.319" stroke-dashoffset="{-offset * 628.319:.3f}" transform="rotate(-90 205 180)"/>')
+            offset += fraction
+            y = 35 + index * 26
+            parts.append(f'<rect x="360" y="{y - 12}" width="14" height="14" fill="{palette[index]}"/>')
+            parts.append(f'<text x="384" y="{y}" font-size="14" fill="#18212b">{html.escape(item["label"])}: {html.escape(_number(item["value"]) + chart.get("unit", ""))}</text>')
+        parts.append('</svg>')
+        svg = "".join(parts).replace("<text ", f'<text font-family="{html.escape(font_family, quote=True)}" ')
+        return f'<figure class="generated-chart donut-chart"><figcaption>{title}</figcaption>{svg}</figure>'
+    if kind == "waterfall":
+        totals = [0]
+        for item in data:
+            totals.append(totals[-1] + item["value"])
+        low, high = min(totals), max(totals)
+        span = high - low or 1
+        left, top, plot_width, plot_height = 65, 25, 710, 210
+        def y(value: float) -> float:
+            return top + plot_height * (high - value) / span
+        parts = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 310" role="img">']
+        zero = y(0)
+        parts.append(f'<line x1="{left}" y1="{zero:.1f}" x2="775" y2="{zero:.1f}" stroke="#8695a1"/>')
+        step = plot_width / len(data)
+        for index, item in enumerate(data):
+            x = left + step * (index + .5)
+            y1, y2 = y(totals[index]), y(totals[index + 1])
+            parts.append(f'<rect x="{x - step * .29:.1f}" y="{min(y1,y2):.1f}" width="{step * .58:.1f}" height="{max(abs(y2-y1), 1):.1f}" fill="{("#245a7a" if item["value"] >= 0 else "#a05549")}"/>')
+            if index + 1 < len(data):
+                parts.append(f'<line x1="{x + step * .29:.1f}" y1="{y2:.1f}" x2="{x + step * .71:.1f}" y2="{y2:.1f}" stroke="#8695a1" stroke-dasharray="3 3"/>')
+            parts.append(f'<text x="{x:.1f}" y="{max(15, min(y1,y2) - 7):.1f}" text-anchor="middle" font-size="14" fill="#18212b">{html.escape(str(item["value"]) + chart.get("unit", ""))}</text>')
+            parts.append(f'<text x="{x:.1f}" y="276" text-anchor="middle" font-size="13" fill="#18212b">{html.escape(item["label"])}</text>')
+        parts.append('</svg>')
+        svg = "".join(parts).replace("<text ", f'<text font-family="{html.escape(font_family, quote=True)}" ')
+        return f'<figure class="generated-chart waterfall-chart"><figcaption>{title}</figcaption>{svg}</figure>'
     maximum = max(item["value"] for item in data) or 1
     width = 800
     height = 310
