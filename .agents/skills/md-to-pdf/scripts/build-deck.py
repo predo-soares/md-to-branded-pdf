@@ -7,6 +7,7 @@ from pathlib import Path
 
 from markdown_it import MarkdownIt
 
+from charts import replace_chart_fences
 from media_validation import guarded_fetcher, validate_and_rewrite
 from render_html_pdf import _load_weasyprint
 
@@ -79,6 +80,7 @@ def build(source: Path, html_output: Path, pdf_output: Path, *, markdown: str | 
         if layout in {"comparison", "metrics"}:
             validate_structured_slide(tokens, layout, index + 1)
         validate_and_rewrite(tokens, source, verified_image_hosts or set())
+        replace_chart_fences(tokens)
         content = parser.renderer.render(tokens, parser.options, {})
         rendered.append(f'<section class="slide {layout}" data-slide="{index + 1}" data-layout="{layout}">{content}</section>')
         metadata.append({"number": index + 1, "layout": layout, "title": headings[0]})

@@ -25,3 +25,10 @@ img { max-width: 100%; max-height: 170mm; }
 pre { background: var(--code-background); padding: 9pt; white-space: pre-wrap; }
 blockquote { margin: 12pt 0; padding-left: 12pt; border-left: 2pt solid var(--rule); color: var(--muted); }
 a { color: inherit; }
+.generated-chart { break-inside: avoid; margin: 14pt 0; }
+.generated-chart svg { width: 100%; height: auto; }
+.generated-chart figcaption { font-weight: 700; color: var(--ink); margin-bottom: 5pt; }
+.metrics { display: flex; flex-wrap: wrap; gap: 12pt; }
+.metric { display: flex; flex-direction: column; min-width: 90pt; padding: 8pt; border-top: 2pt solid var(--accent, #245a7a); }
+.metric strong { font-size: 20pt; }
+.metric span { color: var(--muted); }

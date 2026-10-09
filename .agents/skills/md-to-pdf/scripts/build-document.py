@@ -9,6 +9,7 @@ from pathlib import Path
 
 from markdown_it import MarkdownIt
 
+from charts import replace_chart_fences
 from media_validation import guarded_fetcher, validate_and_rewrite
 from render_html_pdf import _load_weasyprint
 
@@ -31,6 +32,7 @@ def build(source: Path, html_output: Path, pdf_output: Path, *, markdown: str | 
     tokens = parser.parse(markdown)
     verified_image_hosts = verified_image_hosts or set()
     validate_and_rewrite(tokens, source, verified_image_hosts)
+    replace_chart_fences(tokens)
     body = parser.renderer.render(tokens, parser.options, {})
     if figure_images:
         body = re.sub(

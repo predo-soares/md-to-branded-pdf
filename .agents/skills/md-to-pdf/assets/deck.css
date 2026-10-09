@@ -23,3 +23,10 @@ body { font: 16pt/1.35 var(--font-body); }
 .slide tr { break-inside: avoid; }
 .slide.metrics td:last-child { font-size: 22pt; font-weight: 700; color: var(--accent); }
 .slide.metrics td:first-child { width: 65%; }
+.slide .generated-chart { margin: 8mm 0; break-inside: avoid; }
+.slide .generated-chart figcaption { font-size: 15pt; font-weight: 700; margin-bottom: 4mm; }
+.slide .generated-chart svg { width: 100%; height: auto; max-height: 105mm; }
+.slide .metrics { display: flex; flex-wrap: wrap; gap: 10mm; }
+.slide .metric { min-width: 45mm; border-top: 1mm solid var(--accent); padding-top: 4mm; display: flex; flex-direction: column; }
+.slide .metric strong { font-size: 29pt; }
+.slide .metric span { color: var(--muted); }
