@@ -42,7 +42,7 @@ For a Google Fonts family, use `--font 'google:Family Name'`. A new family requi
 
 For Fontsource, use `--font 'fontsource:family-id'` or pin a version with `--font 'fontsource:family-id@5.2.7'`. The first approved download resolves and caches an exact version and its regular and bold Latin files. Later builds use that cache offline. The same download permission rule applies.
 
-Use standard Markdown headings, paragraphs, lists, links, fenced code, and tables. Start with a `#` heading to set the PDF title. See `design.md` for style rules; this cheatsheet is the short usage reference.
+Use standard Markdown headings, paragraphs, lists, links, fenced code, and tables. Start with a `#` heading to set the PDF title. See `references/design.md` for style rules; this cheatsheet is the short usage reference.
 To edit a layout or generated component, use the file map in `references/template-editing.md`, then rebuild the fixture gallery and review the affected pages.
 
 Add a local image with descriptive alt text, such as `![Revenue by quarter](figures/revenue.png)`. Use meaningful link labels, such as `[Project documentation](https://example.org/docs)`. For a remote image from an official source you have verified, pass its exact HTTPS hostname with `--verified-image-host example.org`. Other remote image hosts are rejected.

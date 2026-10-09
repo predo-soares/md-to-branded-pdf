@@ -6,7 +6,7 @@ Each Template owns its layout contract and CSS. The approved résumé remains vi
 The résumé uses its established hierarchy and Geist typography. Its content flows naturally onto one or two A4 pages; earlier experience no longer starts a page by rule. The renderer does not compress text to hold a page count, and more than two pages are rejected.
 
 The PDF is rendered from saved HTML with WeasyPrint. Keep the generated HTML as the reviewable visual source, and check actual PDF pages before approving a layout.
-For the file that owns each Template or component, see `references/template-editing.md`.
+For the file that owns each Template or component, see `template-editing.md`.
 
 Global profile choices are limited to font, accent, and paper color. The initial font is bundled Geist; custom choices include system UI and supported local or downloaded fonts. Document-level choices override the profile only for that build. The résumé remains fixed to Geist and its approved design. The other Templates apply profile choices without weakening their layout contracts.
 The proposal Template retains its existing Geist-based cover and numbered-section styling under default settings. A customized profile can change only its font, accent, and paper color; page geometry, section structure, and spacing stay under the proposal Template's control.

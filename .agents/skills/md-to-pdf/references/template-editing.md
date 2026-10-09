@@ -1,6 +1,6 @@
 # Editing templates and components
 
-Edit Markdown fixtures in `references/examples/` to change example content. Edit `design.md` when changing the documented design rules. Template CSS and HTML are the visual sources; renderer scripts map validated Markdown to those sources. Rebuild the fixture gallery after a change and review every affected PDF page.
+Edit Markdown fixtures in `references/examples/` to change example content. Edit `references/design.md` when changing the documented design rules. Template CSS and HTML are the visual sources; renderer scripts map validated Markdown to those sources. Rebuild the fixture gallery after a change and review every affected PDF page.
 
 | Document | Visual source | Structure and rendering |
 | --- | --- | --- |
