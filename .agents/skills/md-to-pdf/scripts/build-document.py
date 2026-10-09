@@ -28,6 +28,10 @@ def build(source: Path, html_output: Path, pdf_output: Path, *, markdown: str | 
         font = style_profile["font"]
         if font == "Geist":
             styles += f'\n@font-face {{ font-family: "Geist"; src: url("{GEIST.as_uri()}") format("woff2"); }}'
+        elif font != "system-ui":
+            font_file = Path(font)
+            font = "UserSelectedFont"
+            styles += f'\n@font-face {{ font-family: "{font}"; src: url("{font_file.as_uri()}"); }}'
         styles += (f'\n:root {{ --font-body: "{font}", sans-serif; '
                    f'--accent: {style_profile["accent"]}; --paper: {style_profile["paper"]}; }}')
     document = f'''<!doctype html>

@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 
 import yaml
-from style_profile import DEFAULT, load as load_profile, onboard, validate as validate_profile
+from style_profile import DEFAULT, FONTS, load as load_profile, onboard, validate as validate_profile
 
 SCRIPTS = Path(__file__).resolve().parent
 TEMPLATES = {"plain-document": "build-document.py"}
@@ -86,6 +86,11 @@ def main() -> None:
         style_profile.update({key: value for key, value in
                               (("font", args.font), ("accent", args.accent), ("paper", args.paper))
                               if value is not None})
+        if style_profile["font"] not in FONTS:
+            font_path = Path(style_profile["font"]).expanduser()
+            if not font_path.is_absolute():
+                font_path = ((Path.cwd() if args.font is not None else source.parent) / font_path).resolve()
+            style_profile["font"] = str(font_path)
         validate_profile(style_profile)
     except (ValueError, OSError) as error:
         parser.error(str(error))

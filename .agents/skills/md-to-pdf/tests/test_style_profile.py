@@ -9,8 +9,11 @@ import tempfile
 import unittest
 from pathlib import Path
 
+import fitz
+
 
 BUILD = Path(__file__).resolve().parents[1] / "scripts/build.py"
+GEIST = Path(__file__).resolve().parents[1] / "assets/geist-latin.woff2"
 
 
 class StyleProfileTests(unittest.TestCase):
@@ -51,6 +54,23 @@ class StyleProfileTests(unittest.TestCase):
         result = self.build("--paper", "red; color: blue")
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("Invalid paper color", result.stderr)
+
+    def test_selected_local_font_is_embedded(self) -> None:
+        local_font = self.root / "selected.woff2"
+        local_font.write_bytes(GEIST.read_bytes())
+        result = self.build("--font", str(local_font))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        with fitz.open(self.root / "output.pdf") as pdf:
+            fonts = pdf[0].get_fonts()
+        self.assertTrue(any("UserSelectedFont" in font[3] for font in fonts), fonts)
+
+    def test_missing_or_invalid_local_font_fails(self) -> None:
+        missing = self.build("--font", str(self.root / "missing.ttf"))
+        self.assertIn("Selected font file is unavailable", missing.stderr)
+        invalid_file = self.root / "invalid.ttf"
+        invalid_file.write_text("not a font")
+        invalid = self.build("--font", str(invalid_file))
+        self.assertIn("Selected font file is invalid", invalid.stderr)
 
 
 if __name__ == "__main__":

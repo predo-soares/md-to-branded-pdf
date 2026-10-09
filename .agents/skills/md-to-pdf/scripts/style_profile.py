@@ -9,6 +9,7 @@ from pathlib import Path
 
 DEFAULT = {"font": "system-ui", "accent": "#1c1c1c", "paper": "#ffffff"}
 FONTS = {"system-ui", "Geist"}
+FONT_EXTENSIONS = {".ttf", ".otf", ".woff", ".woff2"}
 
 
 def profile_path() -> Path:
@@ -20,7 +21,17 @@ def validate(profile: dict[str, str]) -> dict[str, str]:
     if set(profile) != set(DEFAULT):
         raise ValueError("Style profile must define font, accent, and paper")
     if profile["font"] not in FONTS:
-        raise ValueError(f"Unsupported profile font: {profile['font']}")
+        font = Path(profile["font"]).expanduser()
+        if font.suffix.lower() not in FONT_EXTENSIONS:
+            raise ValueError(f"Unsupported font format: {font.suffix or '(none)'}")
+        if not font.is_file():
+            raise ValueError(f"Selected font file is unavailable: {font}")
+        try:
+            from fontTools.ttLib import TTFont
+            with TTFont(font, lazy=True) as selected_font:
+                selected_font["name"]
+        except Exception as error:
+            raise ValueError(f"Selected font file is invalid: {font}") from error
     for key in ("accent", "paper"):
         if not re.fullmatch(r"#[0-9a-fA-F]{6}", profile[key]):
             raise ValueError(f"Invalid {key} color; use #RRGGBB")
@@ -49,11 +60,13 @@ def onboard() -> dict[str, str]:
         profile = DEFAULT.copy()
     elif choice == "custom":
         profile = {
-            "font": input("Font [system-ui/Geist]: ").strip() or DEFAULT["font"],
+            "font": input("Font [system-ui/Geist/local file path]: ").strip() or DEFAULT["font"],
             "accent": input("Accent color [#RRGGBB]: ").strip() or DEFAULT["accent"],
             "paper": input("Paper color [#RRGGBB]: ").strip() or DEFAULT["paper"],
         }
     else:
         raise ValueError("Choose 'default' or 'custom'")
+    if profile["font"] not in FONTS:
+        profile["font"] = str(Path(profile["font"]).expanduser().resolve())
     save(profile)
     return profile

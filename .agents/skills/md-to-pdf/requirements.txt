@@ -2,4 +2,6 @@ jsonschema>=4.20,<5
 WeasyPrint>=66,<67
 markdown-it-py>=3,<5
 PyYAML>=6,<7
+fonttools>=4.50,<5
+PyMuPDF>=1.24,<2
 reportlab>=4,<5
