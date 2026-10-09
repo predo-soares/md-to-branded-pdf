@@ -13,12 +13,12 @@ Choose the template from the user's request, source content, and project context
 | --- | --- | --- |
 | Résumé or CV | Approved ATS résumé | `python3 .agents/skills/md-to-pdf/scripts/build.py INPUT.md --template resume --html OUTPUT.html --pdf OUTPUT.pdf` |
 | Commercial proposal or similar numbered document | Proposal cover and sections | `python3 .agents/skills/md-to-pdf/scripts/build.py INPUT.md --template proposal --html OUTPUT.html --pdf OUTPUT.pdf` |
-| Application cover letter | Current letter renderer | `python3 .agents/skills/md-to-pdf/scripts/render-cover-letter.py INPUT.md OUTPUT.pdf` |
+| Application cover letter | One-page A4 letter | `python3 .agents/skills/md-to-pdf/scripts/build.py INPUT.md --template cover-letter --html OUTPUT.html --pdf OUTPUT.pdf` |
 | Ordinary Markdown document | Plain A4 document | `python3 .agents/skills/md-to-pdf/scripts/build.py INPUT.md --template plain-document --html OUTPUT.html --pdf OUTPUT.pdf` |
 
 The proposal renderer requires at least one `##` section. Its `assets/document.html` and `assets/tokens.css` control the layout. The first unnumbered `##` immediately after the `#` title is a cover subtitle. Later `##` headings become numbered sections. Proposal-specific investment and work-stage tables render when those headings are present. The standalone `build-proposal.py` command still supports `--kind`, `--client`, `--author`, `--date`, `--footer-left`, and `--footer-right`. Do not use this layout as a generic default.
 
-The unified `scripts/build.py` command currently supports `plain-document`, `proposal`, and `resume`; other existing renderers will join it as their Templates are migrated. Direct builds require `--template` or YAML frontmatter `template`. Matching declarations are accepted; conflicting or unknown selections fail. Use `cheatsheet.md` for user-facing usage and `design.md` for style rules. `assets/plain-document.css` contains the executable plain-document defaults.
+The unified `scripts/build.py` command currently supports `plain-document`, `proposal`, `resume`, and `cover-letter`; other Templates will join it as they are implemented. Direct builds require `--template` or YAML frontmatter `template`. Matching declarations are accepted; conflicting or unknown selections fail. Use `cheatsheet.md` for user-facing usage and `design.md` for style rules. `assets/plain-document.css` contains the executable plain-document defaults.
 
 For plain documents, use local images supplied by the user or images from a verified official HTTPS host. Check an official source before passing its exact hostname through `--verified-image-host`; do not infer that a third-party image is official. Every informative Markdown image needs meaningful alt text, and link labels should describe their destination. Raw HTML is escaped so it cannot bypass these checks. The saved HTML uses absolute local image paths and the PDF retains title, language, image, and link metadata.
 
@@ -36,7 +36,7 @@ Markdown mapping: `# Name` is the identity; the following bold line is the headl
 
 ## Cover letters
 
-The current cover-letter workflow uses `scripts/render-cover-letter.py` and ReportLab. It expects Markdown beginning with `Dear `, body paragraphs, and sign-off. Set `CAREER_NAME`, `CAREER_LOCATION`, `CAREER_EMAIL`, `CAREER_WEBSITE`, `CAREER_RECIPIENT`, and `CAREER_SUBJECT` locally; `CAREER_DATE` is optional. Keep personal values out of tracked files. `assets/templates/cover-letter.html` is a legacy reference; the current renderer does not consume it.
+The cover-letter workflow uses `assets/templates/cover-letter.html` as its canonical visual source, saves HTML, and renders that HTML with WeasyPrint. It expects Markdown beginning with `Dear `, body paragraphs, a sign-off, and a signature. Set `CAREER_NAME`, `CAREER_LOCATION`, `CAREER_EMAIL`, `CAREER_WEBSITE`, `CAREER_RECIPIENT`, and `CAREER_SUBJECT` locally; `CAREER_DATE` is optional. Keep personal values out of tracked files. The one-page A4 contract is enforced. The standalone `scripts/render-cover-letter.py` remains a compatibility command and now saves sibling HTML.
 
 ## Dependencies and review
 

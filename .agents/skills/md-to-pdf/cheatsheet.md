@@ -8,6 +8,7 @@ python3 .agents/skills/md-to-pdf/scripts/build.py input.md --template plain-docu
 
 To build a numbered proposal with its cover, sections, and tables, use `--template proposal` with the same command. The proposal keeps its existing Geist-based visual defaults unless you explicitly customize the global profile or this document's `font`, `accent`, or `paper` values.
 To build a résumé with the approved two-page A4 layout, use `--template resume`. This saves validated `.content.json` next to the HTML. The résumé ignores your global Style profile and rejects document style overrides.
+To build a cover letter, use `--template cover-letter`. The Markdown starts with `Dear ` and ends with a sign-off and signature. Set the `CAREER_NAME`, `CAREER_LOCATION`, `CAREER_EMAIL`, `CAREER_WEBSITE`, `CAREER_RECIPIENT`, and `CAREER_SUBJECT` environment variables locally; `CAREER_DATE` is optional. The saved HTML is the PDF's visual source.
 
 Choose the Template explicitly with `--template` or YAML frontmatter:
 

@@ -139,7 +139,7 @@ Add edge-case fixtures for long titles, dense slides, large tables, long URLs, a
 - The current résumé already has Markdown → validated JSON → canonical HTML → WeasyPrint. Its visual output is the regression baseline.
 - The proposal has its own parser, HTML shell, and Geist tokens; move these into the registry without changing its output unintentionally.
 - The plain document keeps CSS inside `build-document.py`; extract it into a maintained template/style layer.
-- The active cover letter uses ReportLab even though `cover-letter.html` exists. Its migration needs output comparison and a one-page fixture.
+- The cover letter was migrated from ReportLab to saved canonical HTML and WeasyPrint. A synthetic one-page fixture compares its visible text and geometry with the prior renderer.
 - Fonts alter line metrics and pagination. Explicit font changes require a fresh render and fit check; the résumé ignores profile fonts by default.
 - The repository currently forbids Kami asset use and has no license. Reusing selected MIT diagrams requires a narrow rule update and retained upstream notice at implementation time.
 

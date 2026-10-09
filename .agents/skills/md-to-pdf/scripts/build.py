@@ -15,7 +15,7 @@ from style_profile import DEFAULT, FONTS, load as load_profile, onboard, validat
 
 SCRIPTS = Path(__file__).resolve().parent
 TEMPLATES = {"plain-document": "build-document.py", "proposal": "build-proposal.py",
-             "resume": "build-resume.py"}
+             "resume": "build-resume.py", "cover-letter": "render-cover-letter.py"}
 
 
 def load_builder(template: str):

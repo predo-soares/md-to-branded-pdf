@@ -1,85 +1,113 @@
 #!/usr/bin/env python3
-"""Render the project's Markdown cover-letter format to a one-page A4 PDF."""
+"""Render a Markdown cover letter through saved HTML and WeasyPrint."""
 from __future__ import annotations
 
+import html
 import os
 import sys
 from datetime import date
 from pathlib import Path
-from xml.sax.saxutils import escape
+from urllib.parse import urlparse
 
-from reportlab.lib.enums import TA_LEFT, TA_RIGHT
-from reportlab.lib.pagesizes import A4
-from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
-from reportlab.lib.units import mm
-from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
+import fitz
+
+from render_html_pdf import render_pdf
 
 
-def read_letter(path: Path) -> tuple[str, list[str], str, str]:
-    blocks = [part.strip() for part in path.read_text(encoding="utf-8").split("\n\n") if part.strip()]
+TEMPLATE = Path(__file__).resolve().parents[1] / "assets/templates/cover-letter.html"
+
+
+def read_letter(markdown: str) -> tuple[str, list[str], str, str]:
+    blocks = [part.strip() for part in markdown.split("\n\n") if part.strip()]
     if not blocks or not blocks[0].lower().startswith("dear "):
-        raise ValueError("Expected a cover letter beginning with a Dear salutation.")
-    salutation = blocks[0]
-    if len(blocks) < 4:
-        raise ValueError("Cover letter is missing body or sign-off content.")
+        raise ValueError("Expected a cover letter beginning with a Dear salutation")
     if blocks[-1].lower().startswith("portfolio:"):
         blocks.pop()
     if len(blocks) < 4:
-        raise ValueError("Cover letter is missing body paragraphs.")
-    signoff = blocks[-2]
-    signature = blocks[-1]
-    body = blocks[1:-2]
-    return salutation, body, signoff, signature
+        raise ValueError("Cover letter is missing body or sign-off content")
+    return blocks[0], blocks[1:-2], blocks[-2], blocks[-1]
 
 
-def paragraph(text: str, style: ParagraphStyle) -> Paragraph:
-    safe = escape(text).replace("\n", "<br/>")
-    return Paragraph(safe, style)
+def _paragraph(value: str) -> str:
+    return html.escape(value).replace("\n", "<br>")
 
 
-def render(source: Path, destination: Path) -> None:
-    salutation, body, signoff, signature = read_letter(source)
-    name = os.environ.get("CAREER_NAME", "").strip()
-    location = os.environ.get("CAREER_LOCATION", "").strip()
-    email = os.environ.get("CAREER_EMAIL", "").strip()
-    website = os.environ.get("CAREER_WEBSITE", "").strip()
-    recipient = os.environ.get("CAREER_RECIPIENT", "").strip()
-    subject = os.environ.get("CAREER_SUBJECT", "").strip()
-    if not all((name, location, email, website, recipient, subject)):
-        raise ValueError("Set CAREER_NAME, CAREER_LOCATION, CAREER_EMAIL, CAREER_WEBSITE, CAREER_RECIPIENT, and CAREER_SUBJECT before rendering.")
-    application_date = os.environ.get("CAREER_DATE", date.today().strftime("%B %d, %Y"))
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    doc = SimpleDocTemplate(
-        str(destination), pagesize=A4,
-        leftMargin=20 * mm, rightMargin=20 * mm,
-        topMargin=18 * mm, bottomMargin=18 * mm,
-        title="Cover Letter",
-        author=name,
-    )
-    base = getSampleStyleSheet()
-    name_style = ParagraphStyle("Name", parent=base["Normal"], fontName="Helvetica-Bold", fontSize=24, leading=28, textColor="#1c1c1c", spaceAfter=4)
-    contact_style = ParagraphStyle("Contact", parent=base["Normal"], fontName="Helvetica", fontSize=9.5, leading=13, textColor="#444444", spaceAfter=0)
-    date_style = ParagraphStyle("Date", parent=contact_style, alignment=TA_RIGHT, spaceBefore=14, spaceAfter=14)
-    meta_style = ParagraphStyle("Meta", parent=contact_style, alignment=TA_LEFT, spaceAfter=12)
-    subject_style = ParagraphStyle("Subject", parent=base["Normal"], fontName="Helvetica-Bold", fontSize=10.5, leading=14, spaceAfter=12)
-    body_style = ParagraphStyle("Body", parent=base["Normal"], fontName="Helvetica", fontSize=11, leading=16, textColor="#1c1c1c", spaceAfter=9, alignment=TA_LEFT, allowWidows=0, allowOrphans=0)
-    closing_style = ParagraphStyle("Closing", parent=body_style, spaceBefore=5, spaceAfter=9)
-    signature_style = ParagraphStyle("Signature", parent=body_style, fontName="Helvetica-Bold", spaceAfter=0)
+def _metadata() -> dict[str, str]:
+    names = ("NAME", "LOCATION", "EMAIL", "WEBSITE", "RECIPIENT", "SUBJECT")
+    values = {name: os.environ.get("CAREER_" + name, "").strip() for name in names}
+    if not all(values.values()):
+        raise ValueError("Set CAREER_NAME, CAREER_LOCATION, CAREER_EMAIL, CAREER_WEBSITE, CAREER_RECIPIENT, and CAREER_SUBJECT")
+    if urlparse(values["WEBSITE"]).scheme not in {"http", "https"}:
+        raise ValueError("CAREER_WEBSITE must be an HTTP or HTTPS URL")
+    values["DATE"] = os.environ.get("CAREER_DATE", date.today().strftime("%B %d, %Y"))
+    return values
 
-    story = [
-        Paragraph(escape(name), name_style),
-        Paragraph(f'{escape(location)} · <link href="mailto:{escape(email)}" color="#444444">{escape(email)}</link> · <link href="{escape(website)}" color="#444444">{escape(website)}</link>', contact_style),
-        Paragraph(escape(application_date), date_style),
-        Paragraph(escape(recipient).replace("\n", "<br/>"), meta_style),
-        Paragraph(escape(subject), subject_style),
-        paragraph(salutation, body_style),
-    ]
-    story.extend(paragraph(text, body_style) for text in body)
-    story.extend([paragraph(signoff, closing_style), paragraph(signature, signature_style)])
-    doc.build(story)
+
+def build(source: Path, html_output: Path, pdf_output: Path, *, markdown: str | None = None,
+          title_override: str | None = None, language: str = "en",
+          style_profile: dict[str, str] | None = None, style_override: bool = False,
+          verified_image_hosts: set[str] | None = None) -> None:
+    markdown = markdown if markdown is not None else source.read_text(encoding="utf-8")
+    salutation, body, signoff, signature = read_letter(markdown)
+    values = _metadata()
+    email = html.escape(values["EMAIL"], quote=True)
+    website = html.escape(values["WEBSITE"], quote=True)
+    contact = (f'{html.escape(values["LOCATION"])} · <a href="mailto:{email}">{email}</a> · '
+               f'<a href="{website}">{website}</a>')
+    document = TEMPLATE.read_text(encoding="utf-8")
+    fields = {
+        "LANG": html.escape(language, quote=True),
+        "TITLE": html.escape(title_override or f'Cover Letter — {values["SUBJECT"]}'),
+        "NAME": html.escape(values["NAME"]),
+        "CONTACT": contact,
+        "DATE": html.escape(values["DATE"]),
+        "RECIPIENT": _paragraph(values["RECIPIENT"]),
+        "SUBJECT": html.escape(values["SUBJECT"]),
+        "SALUTATION": _paragraph(salutation),
+        "BODY": "".join(f"<p>{_paragraph(paragraph)}</p>" for paragraph in body),
+        "SIGNOFF": _paragraph(signoff),
+        "SIGNATURE": _paragraph(signature),
+    }
+    for key, value in fields.items():
+        document = document.replace("{{" + key + "}}", value)
+    if style_override and style_profile:
+        font = style_profile["font"]
+        extra_css = ""
+        if font.startswith("google:"):
+            font = "GoogleSelectedFont"
+            extra_css = style_profile["font_css"]
+        elif font.startswith("fontsource:"):
+            font = "FontsourceSelectedFont"
+            extra_css = style_profile["font_css"]
+        elif font not in {"system-ui", "Geist"}:
+            path = Path(font)
+            font = "UserSelectedFont"
+            extra_css = f'@font-face {{ font-family: "{font}"; src: url("{path.as_uri()}"); }}'
+        elif font == "Geist":
+            path = Path(__file__).resolve().parents[1] / "assets/geist-latin.woff2"
+            extra_css = f'@font-face {{ font-family: "Geist"; src: url("{path.as_uri()}") format("woff2"); }}'
+        extra_css += (f'\n@page {{ background: {style_profile["paper"]}; }} '
+                      f'body, main {{ background: {style_profile["paper"]}; }} '
+                      f'body {{ font-family: "{font}", Arial, sans-serif; }} '
+                      f'a {{ color: {style_profile["accent"]}; }}')
+        document = document.replace("</style>", extra_css + "\n</style>")
+    html_output.parent.mkdir(parents=True, exist_ok=True)
+    html_output.write_text(document, encoding="utf-8")
+    render_pdf(html_output, pdf_output)
+    with fitz.open(pdf_output) as pdf:
+        if len(pdf) != 1 or abs(pdf[0].rect.width - 595.28) > 1 or abs(pdf[0].rect.height - 841.89) > 1:
+            raise ValueError("Cover-letter content does not fit its one-page A4 layout")
+
+
+def main() -> None:
+    if len(sys.argv) != 3:
+        raise SystemExit("Usage: render-cover-letter.py INPUT.md OUTPUT.pdf")
+    source, pdf_output = map(Path, sys.argv[1:])
+    try:
+        build(source, pdf_output.with_suffix(".html"), pdf_output)
+    except (OSError, ValueError) as error:
+        raise SystemExit(str(error)) from error
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        raise SystemExit("Usage: render-cover-letter.py INPUT.md OUTPUT.pdf")
-    render(Path(sys.argv[1]), Path(sys.argv[2]))
+    main()
