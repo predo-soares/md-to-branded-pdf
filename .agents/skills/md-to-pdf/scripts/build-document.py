@@ -31,6 +31,9 @@ def build(source: Path, html_output: Path, pdf_output: Path, *, markdown: str | 
         elif font.startswith("google:"):
             font = "GoogleSelectedFont"
             styles += "\n" + style_profile["font_css"]
+        elif font.startswith("fontsource:"):
+            font = "FontsourceSelectedFont"
+            styles += "\n" + style_profile["font_css"]
         elif font != "system-ui":
             font_file = Path(font)
             font = "UserSelectedFont"

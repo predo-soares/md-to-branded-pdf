@@ -10,6 +10,7 @@ from pathlib import Path
 
 import yaml
 from google_fonts import resolve as resolve_google_font
+from fontsource_fonts import resolve as resolve_fontsource_font
 from style_profile import DEFAULT, FONTS, load as load_profile, onboard, validate as validate_profile
 
 SCRIPTS = Path(__file__).resolve().parent
@@ -52,7 +53,7 @@ def main() -> None:
     parser.add_argument("--template", choices=sorted(TEMPLATES))
     parser.add_argument("--font", help="Document font; overrides global profile")
     parser.add_argument("--allow-font-download", action="store_true",
-                        help="Explicitly allow a new Google Fonts download")
+                        help="Explicitly allow a new Google Fonts or Fontsource download")
     parser.add_argument("--accent", help="Document accent color (#RRGGBB)")
     parser.add_argument("--paper", help="Document paper color (#RRGGBB)")
     parser.add_argument("--html", required=True, type=Path, help="Saved HTML output")
@@ -89,7 +90,7 @@ def main() -> None:
         style_profile.update({key: value for key, value in
                               (("font", args.font), ("accent", args.accent), ("paper", args.paper))
                               if value is not None})
-        if style_profile["font"] not in FONTS and not style_profile["font"].startswith("google:"):
+        if style_profile["font"] not in FONTS and not style_profile["font"].startswith(("google:", "fontsource:")):
             font_path = Path(style_profile["font"]).expanduser()
             if not font_path.is_absolute():
                 font_path = ((Path.cwd() if args.font is not None else source.parent) / font_path).resolve()
@@ -104,6 +105,15 @@ def main() -> None:
                 if not (cache_root() / key / "manifest.json").exists():
                     allow = input(f"Download Google Fonts family '{family}' for this PDF? [y/N]: ").strip().lower() in {"y", "yes"}
             style_profile["font_css"] = resolve_google_font(family, allow_download=allow)
+        elif style_profile["font"].startswith("fontsource:"):
+            specifier = style_profile["font"][11:]
+            try:
+                style_profile["font_css"] = resolve_fontsource_font(specifier, allow_download=False)
+            except PermissionError:
+                allow = args.allow_font_download
+                if not allow and sys.stdin.isatty():
+                    allow = input(f"Download Fontsource family '{specifier}' for this PDF? [y/N]: ").strip().lower() in {"y", "yes"}
+                style_profile["font_css"] = resolve_fontsource_font(specifier, allow_download=allow)
     except (ValueError, OSError, PermissionError) as error:
         parser.error(str(error))
     load_builder(template)(source, html_output, pdf_output, markdown=markdown,

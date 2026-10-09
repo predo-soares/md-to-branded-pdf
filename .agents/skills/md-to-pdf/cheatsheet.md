@@ -25,4 +25,6 @@ The first interactive build offers default or custom styling. Choose `system-ui`
 
 For a Google Fonts family, use `--font 'google:Family Name'`. A new family requires permission before download; an interactive build prompts. In non-interactive use, pass `--allow-font-download` only after the user has authorized that specific download. Cached families rebuild offline without that flag.
 
+For Fontsource, use `--font 'fontsource:family-id'` or pin a version with `--font 'fontsource:family-id@5.2.7'`. The first approved download resolves and caches an exact version and its regular and bold Latin files. Later builds use that cache offline. The same download permission rule applies.
+
 Use standard Markdown headings, paragraphs, lists, links, fenced code, and tables. Start with a `#` heading to set the PDF title. See `design.md` for style rules; this cheatsheet is the short usage reference.
