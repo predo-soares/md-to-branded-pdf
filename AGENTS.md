@@ -7,7 +7,7 @@ This repository collects skills and small tools I create to research vacancies, 
 - Personal résumé sources, vacancy-specific application documents, generated previews/PDFs, raw page captures, caches, and credentials are local inputs or outputs; do not add them to Git.
 - Keep fixtures synthetic or scrubbed of personal data. Never copy private application content into examples, tests, or documentation.
 - Add a directory only when it has real content. Put authored Codex skills in `.agents/skills/`, reusable tooling in `tools/`, and reusable research/benchmark documentation in `docs/`.
-- Do not add a repository license until I choose one.
+- The repository is licensed under MIT in `LICENSE`. Preserve separate notices for third-party materials and assets.
 
 ## Career-document workflow
 

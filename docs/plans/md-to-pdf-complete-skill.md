@@ -4,7 +4,7 @@
 
 Turn the project-owned `md-to-pdf` skill into a reusable, nearly deterministic PDF document system. It accepts Markdown as the editable source, selects a suitable template from context or an explicit choice, renders canonical HTML, and creates PDFs with WeasyPrint. The skill, code comments, errors, and maintained documentation are written in English. Document content may be in Latin-script languages, initially Portuguese and English.
 
-Kami is an architectural and quality reference, not the source of this project's visual defaults. The approved résumé layout remains visually unchanged. No web pages, PPTX, Tailwind build step, or repository license are part of this plan.
+Kami is an architectural and quality reference, not the source of this project's visual defaults. The approved résumé layout remains visually unchanged. No web pages, PPTX, or Tailwind build step are part of this plan. The repository and skill use the MIT License.
 
 ## Confirmed product contract
 
@@ -37,8 +37,8 @@ Initial pitch-deck layouts: cover, assertion with evidence, comparison, metrics/
 
 - Keep `assets/templates/resume-ats.html` as the approved, isolated résumé visual source. Shared tokens and global font preferences do not restyle it unless the user explicitly requests a design change.
 - Start the other templates from the proposal's sans-serif, white-paper, neutral direction. Use project-owned palette, typography, spacing, tables, and page rules. Do not copy Kami's serif default or color values.
-- `references/design.md` is the human-readable design contract; `assets/styles/tokens.css` and templates hold executable values. A design-guide change requires corresponding code changes and a consistency check.
-- `CHEATSHEET.md` is a short user-facing reference, not the source of executable defaults.
+- `references/design.md` is the human-readable design contract and the source of color tokens for every non-résumé template and generated visual. CSS and SVG renderers load its YAML palette at build time. The approved résumé remains isolated. A design-guide change requires corresponding code changes and a consistency check.
+- `cheatsheet.md` is a short user-facing reference, not the source of executable defaults.
 - Never shrink fonts, change spacing, alter page geometry, or truncate content automatically to make a document fit. Adapt content to the chosen template. A user-requested layout change is a separate edit to template elements or the design guide and implementation.
 - For a one-page document or slide that cannot fit, identify the overflowing block and stop for editorial revision. Long documents paginate naturally while keeping headings, table rows, and figures together where feasible.
 
@@ -52,8 +52,8 @@ Initial pitch-deck layouts: cover, assertion with evidence, comparison, metrics/
 ### Media and accessibility
 
 - Accept logos and images supplied by the user or obtained from verifiable official sources; never invent replacement brand assets.
-- Start with reusable bars, lines, metric displays, flowcharts, and timelines driven by structured Markdown data. Users do not edit SVG coordinates manually.
-- Selected Kami diagram SVG implementations may be adapted to this project's style. Retain the required MIT copyright and permission notice with reused material. Update the existing `AGENTS.md` prohibition only for these explicitly selected diagrams when they are actually imported; do not add a repository-wide license.
+- Generate bars, lines, metrics, donuts, and waterfalls, plus timelines, flowcharts, quadrants, layer stacks, and swimlanes from structured Markdown data. Users do not edit SVG coordinates manually.
+- Selected Kami diagram composition ideas may be implemented in this project's own data-driven SVGs. Retain the required upstream MIT notice. The project itself is MIT-licensed.
 - Templates include document language, title, logical reading order, descriptive links, and alt text for informative images.
 
 ## Target architecture
@@ -72,27 +72,29 @@ flowchart LR
   PDF --> Verify[Opt-in extended verification]
 ```
 
-Use one template registry and one `scripts/build.py` entry point. Keep the existing scripts as compatibility paths during migration. Share a WeasyPrint renderer, font resolver, profile loader, and output handling across types. Preserve the saved HTML as the source of each PDF, including cover letters after migration from ReportLab. Structured intermediates are generated artifacts, not independent editorial files.
+Use one template registry and one `scripts/build.py` entry point. Internal modules are grouped under `scripts/md_to_pdf/{templates,content,visuals,fonts,rendering}/`; `scripts/build_review_gallery.py` generates review fixtures and `scripts/verify.py` checks a PDF. Share a WeasyPrint renderer, font resolver, profile loader, and output handling across types. Preserve the saved HTML as the source of each PDF. Structured intermediates are generated artifacts, not independent editorial files.
 
 Recommended skill layout when each file has real content:
 
 ```text
 .agents/skills/md-to-pdf/
   SKILL.md
-  CHEATSHEET.md
+  cheatsheet.md
+  LICENSE
+  VERSION
   assets/
-    styles/tokens.css
+    *.css
     templates/*.html
-    diagrams/                 # selected, attributed SVG implementations
+    diagrams/                 # third-party attribution notice
   references/
     design.md
     schemas/*.json
     font-sources.md
   scripts/
     build.py                  # unified CLI
-    render_pdf.py
+    build_review_gallery.py
     verify.py
-    ...type parsers/renderers
+    md_to_pdf/                # template, content, visual, font, render modules
   tests/
     fixtures/*.md            # synthetic content only
     test_build_*.py
@@ -102,7 +104,7 @@ Recommended skill layout when each file has real content:
 
 The build always stops for invalid Markdown, invalid required schema content, an unavailable explicitly selected font, or an empty/unreadable PDF. It never changes visual rules to force success.
 
-The extended `build.py --verify` suite is opt-in during development. It checks page count and dimensions against the template contract, remaining placeholders, text extraction and required-content coverage, embedded fonts, link annotations, language/metadata, page geometry, and obvious overflow. A fixture-generation script builds every Template from synthetic Markdown and saves HTML, PDF, every page image, and a review manifest. A human inspects clipping, overlaps, awkward breaks, and chart labels; agents prepare evidence but cannot approve layout quality.
+The opt-in `scripts/verify.py` checks page count and dimensions, text extraction, placeholders, embedded fonts, links, and likely overflow. `scripts/build_review_gallery.py` builds every Template from synthetic Markdown and saves HTML, PDF, page images, and a review manifest. A person inspects clipping, overlaps, awkward breaks, and chart labels; automated checks prepare evidence but do not approve layout quality.
 
 Before public release, run `--verify` and automated business-rule tests over the full synthetic fixture matrix and record human visual approval of every Template. Resolve reproducible overflow, clipping, missing-glyph, and pagination defects. Generated PDFs, HTML previews, page images, and private documents remain ignored local outputs.
 
@@ -112,7 +114,7 @@ Each row needs a synthetic Markdown fixture that runs through the public unified
 
 | Type | Minimum generation assertion |
 | --- | --- |
-| Résumé | Validated sidecar; two A4 pages; all roles and skills last; approved template unchanged |
+| Résumé | Validated sidecar; one page when content fits and a second only when needed; all roles retained and skills last; approved template unchanged |
 | Cover letter | One A4 page; sender/recipient/body/sign-off retained; HTML and PDF agree |
 | Proposal | Cover metadata, numbered sections, tables and links retained |
 | Plain document | Headings, lists, code, tables, images and natural page breaks render |
@@ -127,21 +129,20 @@ Add edge-case fixtures for long titles, dense slides, large tables, long URLs, a
 
 ## Implementation phases
 
-1. **Foundation:** document the project visual system and template registry; add unified CLI, profile/onboarding contract, local font resolution, shared WeasyPrint renderer, and mandatory build invariants. Preserve résumé output.
-2. **Existing paths:** route résumé, proposal, and plain document through the registry; migrate cover letter to its HTML template and WeasyPrint; add generation tests for all four.
-3. **Document catalog:** add one-pager, long document, portfolio, analytical report, and changelog with the agreed schemas and synthetic generation tests.
-4. **Pitch deck and media:** add 16:9 slide templates, structured charts/diagrams, selected attributed Kami SVGs, and per-layout tests.
-5. **Extended verification:** implement opt-in checks, business-rule tests, a fixture-gallery script, and human visual review workflow; fix defects uncovered by the matrix without silent layout changes.
-6. **Public readiness:** run the entire suite, inspect every template, verify documentation and English-only maintained instructions, check dependency/package size, then update compatibility guidance and release notes. Publish only after these gates pass.
+1. **Foundation — complete:** unified CLI and router, style profile/onboarding, local and downloadable font resolution, shared WeasyPrint rendering, and build invariants.
+2. **Core templates — complete:** résumé, proposal, plain document, and cover letter render through the unified command and preserve canonical HTML output.
+3. **Document catalog — complete:** all ten templates have content contracts, renderers, and synthetic fixtures.
+4. **Pitch deck and media — implemented:** 16:9 PDF slides, structured charts and diagrams, media validation, and third-party attribution.
+5. **Automated verification — implemented:** 51 business-rule tests, PDF verification command, and a 10-template fixture gallery. Rerun the suite after final palette integration.
+6. **Public readiness — in progress:** finish and verify design-guide color integration, inspect every generated PDF, update GitHub issue states, confirm license and version metadata, and retain human visual approval as a release gate.
 
 ## Current implementation and migration risks
 
 - The current résumé already has Markdown → validated JSON → canonical HTML → WeasyPrint. Its visual output is the regression baseline.
-- The proposal has its own parser, HTML shell, and Geist tokens; move these into the registry without changing its output unintentionally.
-- The plain document keeps CSS inside `build-document.py`; extract it into a maintained template/style layer.
-- The cover letter was migrated from ReportLab to saved canonical HTML and WeasyPrint. A synthetic one-page fixture compares its visible text and geometry with the prior renderer.
+- Proposal, plain-document, and cover-letter renderers are integrated with the unified registry and WeasyPrint.
 - Fonts alter line metrics and pagination. Explicit font changes require a fresh render and fit check; the résumé ignores profile fonts by default.
-- The repository currently forbids Kami asset use and has no license. Reusing selected MIT diagrams requires a narrow rule update and retained upstream notice at implementation time.
+- The repository and skill are MIT-licensed. The adapted Kami diagram composition notice remains in `assets/diagrams/KAMI-MIT-NOTICE.txt`; third-party fonts and dependencies retain their own terms.
+- Generated charts and diagrams load their grayscale palette from the YAML color block in `references/design.md`. Template CSS now references the same tokens; inspect the regenerated PDFs before release.
 
 ## References reviewed
 

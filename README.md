@@ -1,30 +1,30 @@
 # Career Tools
 
-Um espaço para guardar e evoluir skills e ferramentas próprias que ajudam na busca de vagas, pesquisa de empresas, avaliação de aderência e preparação de candidaturas.
+A home for reusable skills and tools that support job research, company research, role-fit evaluation, and application preparation.
 
-## O que entra no repositório
+## What belongs in this repository
 
-- Skills autorais do Codex em `.agents/skills/`.
-- Ferramentas reutilizáveis em `tools/`, organizadas por finalidade quando forem criadas.
-- Esquemas, documentação e benchmarks reutilizáveis em `docs/`.
-- Exemplos e fixtures sintéticos, sem informações pessoais ou dados de candidaturas reais.
+- Authored Codex skills in `.agents/skills/`.
+- Reusable tools in `tools/`, organized by purpose as they are added.
+- Reusable schemas, documentation, and benchmarks in `docs/`.
+- Synthetic examples and fixtures that contain no personal information or real application data.
 
-## O que fica local
+## What stays local
 
-Currículos mestre, versões adaptadas a vagas, cartas específicas, PDFs, HTMLs de preview, capturas brutas de páginas e experimentos com dados de vagas ficam no checkout local e são ignorados pelo Git. Assim, o repositório guarda o processo e as ferramentas sem virar um arquivo de candidaturas pessoais.
+Master résumés, vacancy-specific versions, application letters, PDFs, HTML previews, raw page captures, and experiments with vacancy data stay in the local checkout and are ignored by Git. The repository stores the workflow and tools, not a private application archive.
 
-A cópia local da skill Kami também é ignorada. Ela foi usada como referência durante a criação do fluxo próprio de documentos; este repositório usa e mantém apenas a implementação própria.
+The local copy of the Kami skill is also ignored. Kami was an architectural reference while this project's document workflow was developed; the repository runs and maintains its own implementation.
 
-## Estrutura atual
+## Current structure
 
 ```text
-.agents/skills/md-to-pdf/      Skill para PDFs a partir de Markdown
-docs/                         Planos e documentação reutilizável
-tools/                        Reservado para ferramentas próprias
+.agents/skills/md-to-pdf/      Markdown-to-PDF skill
+docs/                          Plans and reusable documentation
+tools/                         Reserved for reusable project tools
 ```
 
-Os diretórios de ferramentas serão criados quando houver conteúdo para eles. Não há licença definida ainda.
+Tool directories are added when they contain real content. The repository is licensed under MIT; see `LICENSE`. Third-party materials retain their own notices and terms.
 
-## Markdown para PDF
+## Markdown to PDF
 
-A skill `.agents/skills/md-to-pdf/SKILL.md` seleciona o template pelo contexto para currículos, cartas de apresentação e propostas. Quando a escolha não é clara, o agente pergunta ao usuário. O fluxo de currículo continua Markdown → JSON validado → HTML canônico → PDF. Os documentos pessoais usados como entrada e as saídas geradas não são versionados. As dependências estão em `.agents/skills/md-to-pdf/requirements.txt`.
+The `.agents/skills/md-to-pdf/SKILL.md` skill selects a PDF template from context for résumés, cover letters, proposals, pitch decks, and other document types. When the right template is unclear, the agent asks the user. Résumés follow Markdown → validated JSON → canonical HTML → PDF. Personal source documents and generated outputs are not committed. Dependencies are listed in `.agents/skills/md-to-pdf/requirements.txt`.

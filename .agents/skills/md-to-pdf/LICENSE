@@ -1,11 +1,25 @@
-Licensing status for md-to-pdf
+MIT License
 
-No license has been granted for the original md-to-pdf skill files. The owner
-has not yet selected a license for this skill or the repository. This file is
-an information notice, not a grant of permission to use, modify, or distribute
-the original files.
+Copyright (c) 2026 Pedro Soares
 
-Third-party material retains its own terms. The diagram compositions adapted
-from Kami are accompanied by the MIT copyright and permission notice at
-assets/diagrams/KAMI-MIT-NOTICE.txt. Bundled fonts and external dependencies
-remain subject to their respective licenses; this notice does not replace them.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+Third-party materials retain their own license terms. The adapted diagram
+composition notice is in assets/diagrams/KAMI-MIT-NOTICE.txt. Bundled fonts
+and dependencies are subject to their respective licenses.
