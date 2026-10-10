@@ -6,6 +6,7 @@ import json
 import math
 
 from markdown_it.token import Token
+from md_to_pdf.visuals.palette import COLORS
 
 
 def _number(value: object) -> str:
@@ -58,7 +59,7 @@ def render(raw: str, font_family: str = "Geist") -> str:
         return f'<figure class="generated-chart metric-chart" role="img" aria-label="{title}"><figcaption>{title}</figcaption><div class="metrics">{items}</div></figure>'
     if kind == "donut":
         total = sum(item["value"] for item in data)
-        palette = ("#444444", "#555555", "#666666", "#777777", "#888888", "#999999", "#aaaaaa", "#bbbbbb", "#cccccc", "#777777", "#888888", "#999999")
+        palette = COLORS["chart_series"]
         parts = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 360" role="img">']
         offset = 0.0
         for index, item in enumerate(data):
@@ -68,7 +69,7 @@ def render(raw: str, font_family: str = "Geist") -> str:
             offset += fraction
             y = 35 + index * 26
             parts.append(f'<rect x="360" y="{y - 12}" width="14" height="14" fill="{palette[index]}"/>')
-            parts.append(f'<text x="384" y="{y}" font-size="14" fill="#222222">{html.escape(item["label"])}: {html.escape(_number(item["value"]) + chart.get("unit", ""))}</text>')
+            parts.append(f'<text x="384" y="{y}" font-size="14" fill="{COLORS["ink"]}">{html.escape(item["label"])}: {html.escape(_number(item["value"]) + chart.get("unit", ""))}</text>')
         parts.append('</svg>')
         svg = "".join(parts).replace("<text ", f'<text font-family="{html.escape(font_family, quote=True)}" ')
         return f'<figure class="generated-chart donut-chart"><figcaption>{title}</figcaption>{svg}</figure>'
@@ -83,16 +84,17 @@ def render(raw: str, font_family: str = "Geist") -> str:
             return top + plot_height * (high - value) / span
         parts = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 310" role="img">']
         zero = y(0)
-        parts.append(f'<line x1="{left}" y1="{zero:.1f}" x2="775" y2="{zero:.1f}" stroke="#999999"/>')
+        parts.append(f'<line x1="{left}" y1="{zero:.1f}" x2="775" y2="{zero:.1f}" stroke="{COLORS["line"]}"/>')
         step = plot_width / len(data)
         for index, item in enumerate(data):
             x = left + step * (index + .5)
             y1, y2 = y(totals[index]), y(totals[index + 1])
-            parts.append(f'<rect x="{x - step * .29:.1f}" y="{min(y1,y2):.1f}" width="{step * .58:.1f}" height="{max(abs(y2-y1), 1):.1f}" fill="{("#555555" if item["value"] >= 0 else "#999999")}"/>')
+            bar_color = COLORS["positive"] if item["value"] >= 0 else COLORS["negative"]
+            parts.append(f'<rect x="{x - step * .29:.1f}" y="{min(y1,y2):.1f}" width="{step * .58:.1f}" height="{max(abs(y2-y1), 1):.1f}" fill="{bar_color}"/>')
             if index + 1 < len(data):
-                parts.append(f'<line x1="{x + step * .29:.1f}" y1="{y2:.1f}" x2="{x + step * .71:.1f}" y2="{y2:.1f}" stroke="#999999" stroke-dasharray="3 3"/>')
-            parts.append(f'<text x="{x:.1f}" y="{max(15, min(y1,y2) - 7):.1f}" text-anchor="middle" font-size="14" fill="#222222">{html.escape(str(item["value"]) + chart.get("unit", ""))}</text>')
-            parts.append(f'<text x="{x:.1f}" y="276" text-anchor="middle" font-size="13" fill="#222222">{html.escape(item["label"])}</text>')
+                parts.append(f'<line x1="{x + step * .29:.1f}" y1="{y2:.1f}" x2="{x + step * .71:.1f}" y2="{y2:.1f}" stroke="{COLORS["line"]}" stroke-dasharray="3 3"/>')
+            parts.append(f'<text x="{x:.1f}" y="{max(15, min(y1,y2) - 7):.1f}" text-anchor="middle" font-size="14" fill="{COLORS["ink"]}">{html.escape(str(item["value"]) + chart.get("unit", ""))}</text>')
+            parts.append(f'<text x="{x:.1f}" y="276" text-anchor="middle" font-size="13" fill="{COLORS["ink"]}">{html.escape(item["label"])}</text>')
         parts.append('</svg>')
         svg = "".join(parts).replace("<text ", f'<text font-family="{html.escape(font_family, quote=True)}" ')
         return f'<figure class="generated-chart waterfall-chart"><figcaption>{title}</figcaption>{svg}</figure>'
@@ -103,7 +105,7 @@ def render(raw: str, font_family: str = "Geist") -> str:
     plot_width = width - left - right
     plot_height = height - top - bottom
     parts = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" role="img" aria-label="{title}">',
-             f'<line x1="{left}" y1="{top + plot_height}" x2="{width - right}" y2="{top + plot_height}" stroke="#666666"/>']
+             f'<line x1="{left}" y1="{top + plot_height}" x2="{width - right}" y2="{top + plot_height}" stroke="{COLORS["muted"]}"/>']
     positions = []
     for index, item in enumerate(data):
         x = left + plot_width * (index + 0.5) / len(data)
@@ -113,13 +115,13 @@ def render(raw: str, font_family: str = "Geist") -> str:
         value = html.escape(_number(item["value"]) + chart.get("unit", ""))
         if kind == "bar":
             bar_width = plot_width / len(data) * 0.58
-            parts.append(f'<rect x="{x - bar_width / 2:.1f}" y="{y:.1f}" width="{bar_width:.1f}" height="{top + plot_height - y:.1f}" fill="#555555"/>')
-        parts.append(f'<text x="{x:.1f}" y="{max(14, y - 8):.1f}" text-anchor="middle" font-size="14" fill="#222222">{value}</text>')
-        parts.append(f'<text x="{x:.1f}" y="{height - 34}" text-anchor="middle" font-size="13" fill="#222222">{label}</text>')
+            parts.append(f'<rect x="{x - bar_width / 2:.1f}" y="{y:.1f}" width="{bar_width:.1f}" height="{top + plot_height - y:.1f}" fill="{COLORS["accent"]}"/>')
+        parts.append(f'<text x="{x:.1f}" y="{max(14, y - 8):.1f}" text-anchor="middle" font-size="14" fill="{COLORS["ink"]}">{value}</text>')
+        parts.append(f'<text x="{x:.1f}" y="{height - 34}" text-anchor="middle" font-size="13" fill="{COLORS["ink"]}">{label}</text>')
     if kind == "line":
         points = " ".join(f"{x:.1f},{y:.1f}" for x, y in positions)
-        parts.append(f'<polyline points="{points}" fill="none" stroke="#555555" stroke-width="4"/>')
-        parts.extend(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="5" fill="#555555"/>' for x, y in positions)
+        parts.append(f'<polyline points="{points}" fill="none" stroke="{COLORS["accent"]}" stroke-width="4"/>')
+        parts.extend(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="5" fill="{COLORS["accent"]}"/>' for x, y in positions)
     parts.append("</svg>")
     svg = "".join(parts).replace("<text ", f'<text font-family="{html.escape(font_family, quote=True)}" ')
     return (f'<figure class="generated-chart {kind}-chart"><figcaption>{title}</figcaption>'

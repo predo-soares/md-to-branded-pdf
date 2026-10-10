@@ -1,5 +1,36 @@
 # Design system
 
+## Generated visual color tokens
+
+This palette is the source of truth for colors used by generated charts and diagrams. Edit these values here; the renderers load them when building SVG output.
+
+```yaml
+visual_colors:
+  paper: "#ffffff"
+  ink: "#222222"
+  muted: "#666666"
+  accent: "#555555"
+  accent_light: "#e6e6e6"
+  surface: "#f2f2f2"
+  line: "#999999"
+  line_light: "#cccccc"
+  positive: "#555555"
+  negative: "#999999"
+  chart_series:
+    - "#444444"
+    - "#555555"
+    - "#666666"
+    - "#777777"
+    - "#888888"
+    - "#999999"
+    - "#aaaaaa"
+    - "#bbbbbb"
+    - "#cccccc"
+    - "#777777"
+    - "#888888"
+    - "#999999"
+```
+
 The project default is a restrained Geist document system on white A4 paper. Every Template uses bundled Geist by default, including text in generated charts and diagrams. The plain-document Template uses 20 mm margins, 11 pt body text, dark ink, understated rules, and a quiet code background. Headings are distinct without decorative serif styling. Its executable defaults live in `assets/plain-document.css`.
 
 Each Template owns its layout contract and CSS. The approved résumé remains visually isolated in `assets/templates/resume-ats.html`; do not apply these plain-document defaults to it. Edit content to fit a Template. Change layout rules only when the user explicitly asks to change the Template or this design guide.
