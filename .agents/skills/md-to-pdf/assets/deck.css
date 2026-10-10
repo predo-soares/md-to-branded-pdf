@@ -1,4 +1,4 @@
-:root { --paper: #fff; --ink: #18212b; --muted: #52606c; --accent: #245a7a; --font-body: "Geist", Arial, sans-serif; }
+:root { --paper: #fff; --ink: #222222; --muted: #666666; --accent: #555555; --font-body: "Geist", Arial, sans-serif; }
 @page { size: 320mm 180mm; margin: 0; }
 html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); }
 body { font: 16pt/1.35 var(--font-body); }
