@@ -10,6 +10,7 @@ from pathlib import Path
 
 from markdown_it import MarkdownIt
 from md_to_pdf.rendering.render_html_pdf import _load_weasyprint
+from md_to_pdf.visuals.palette import COLORS, css_variables
 
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -19,13 +20,19 @@ MARKDOWN = MarkdownIt("commonmark", {"breaks": True}).enable("table")
 
 
 def tokens() -> dict[str, str]:
-    return dict(re.findall(r"(--[\w-]+)\s*:\s*([^;]+);", TOKENS.read_text()))
+    values = dict(re.findall(r"(--[\w-]+)\s*:\s*([^;]+);", TOKENS.read_text()))
+    values.update({f"--design-{name.replace('_', '-')}": color
+                   for name, color in COLORS.items() if name != "chart_series"})
+    values.update({"--paper": COLORS["paper"], "--ink": COLORS["ink"],
+                   "--muted": COLORS["muted"], "--soft": COLORS["surface"],
+                   "--accent": COLORS["accent"]})
+    return values
 
 
 def css() -> str:
     values = tokens()
     font_data = base64.b64encode((ROOT / "assets" / "geist-latin.woff2").read_bytes()).decode("ascii")
-    style = f'@font-face {{ font-family: "Geist"; src: url(data:font/woff2;base64,{font_data}) format("woff2"); font-weight: 100 900; }}\n' + """
+    style = f'@font-face {{ font-family: "Geist"; src: url(data:font/woff2;base64,{font_data}) format("woff2"); font-weight: 100 900; }}\n' + css_variables() + """
 @page { size: A4; margin: var(--page-margin); background: var(--paper); }
 * { box-sizing: border-box; }
 html, body { margin: 0; color: var(--ink); background: var(--paper); }

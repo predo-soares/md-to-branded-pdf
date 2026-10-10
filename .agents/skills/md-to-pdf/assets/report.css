@@ -1,9 +1,9 @@
 :root {
-  --paper: #fff;
-  --ink: #1d1d1b;
-  --muted: #555;
-  --rule: #d2d2d2;
-  --code-background: #f4f4f4;
+  --paper: var(--design-paper);
+  --ink: var(--design-ink);
+  --muted: var(--design-muted);
+  --rule: var(--design-rule);
+  --code-background: var(--design-code-background);
   --font-body: "Geist", Arial, sans-serif;
 }
 
@@ -29,6 +29,6 @@ a { color: inherit; }
 .generated-chart svg { width: 100%; height: auto; font-family: var(--font-body); }
 .generated-chart figcaption { font-weight: 700; color: var(--ink); margin-bottom: 5pt; }
 .metrics { display: flex; flex-wrap: wrap; gap: 12pt; }
-.metric { display: flex; flex-direction: column; min-width: 90pt; padding: 8pt; border-top: 2pt solid var(--accent, #555555); }
+.metric { display: flex; flex-direction: column; min-width: 90pt; padding: 8pt; border-top: 2pt solid var(--accent); }
 .metric strong { font-size: 20pt; }
 .metric span { color: var(--muted); }

@@ -1,9 +1,9 @@
 :root {
-  --paper: #fff;
-  --ink: #1d1d1b;
-  --muted: #555;
-  --accent: #383733;
-  --rule: #d8d8d8;
+  --paper: var(--design-paper);
+  --ink: var(--design-ink);
+  --muted: var(--design-muted);
+  --accent: var(--design-accent);
+  --rule: var(--design-rule);
   --font-body: "Geist", Arial, sans-serif;
 }
 
@@ -20,6 +20,6 @@ li { margin: 0 0 3pt; }
 table { width: 100%; border-collapse: collapse; margin: 5pt 0 8pt; }
 th, td { padding: 5pt 6pt 5pt 0; border-bottom: .6pt solid var(--rule); text-align: left; vertical-align: top; }
 tr, img, pre { break-inside: avoid; }
-pre { padding: 7pt; white-space: pre-wrap; overflow-wrap: anywhere; background: #f2f2f2; }
+pre { padding: 7pt; white-space: pre-wrap; overflow-wrap: anywhere; background: var(--design-code-background); }
 img { max-width: 100%; }
 a { color: var(--accent); }

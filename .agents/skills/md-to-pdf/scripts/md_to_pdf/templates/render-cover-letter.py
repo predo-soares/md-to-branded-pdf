@@ -12,6 +12,7 @@ from urllib.parse import urlparse
 import fitz
 
 from md_to_pdf.rendering.render_html_pdf import _load_weasyprint
+from md_to_pdf.visuals.palette import css_variables
 
 
 TEMPLATE = Path(__file__).resolve().parents[3] / "assets/templates/cover-letter.html"
@@ -59,6 +60,7 @@ def build(source: Path, html_output: Path, pdf_output: Path, *, markdown: str | 
     fields = {
         "FONT_FACE": (f'@font-face {{ font-family: "Geist"; src: url("{(TEMPLATE.parent.parent / "geist-latin.woff2").as_uri()}") '
                       'format("woff2"); font-weight: 100 900; }'),
+        "DESIGN_COLORS": css_variables(),
         "LANG": html.escape(language, quote=True),
         "TITLE": html.escape(title_override or f'Cover Letter — {values["SUBJECT"]}'),
         "NAME": html.escape(values["NAME"]),

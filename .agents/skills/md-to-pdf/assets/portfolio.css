@@ -1,9 +1,9 @@
 :root {
-  --paper: #fff;
-  --ink: #1d1d1b;
-  --muted: #555;
-  --rule: #d6d6d6;
-  --code-background: #f3f3f3;
+  --paper: var(--design-paper);
+  --ink: var(--design-ink);
+  --muted: var(--design-muted);
+  --rule: var(--design-rule);
+  --code-background: var(--design-code-background);
   --font-body: "Geist", Arial, sans-serif;
 }
 

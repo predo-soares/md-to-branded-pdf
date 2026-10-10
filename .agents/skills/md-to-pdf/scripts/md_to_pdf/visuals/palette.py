@@ -9,7 +9,7 @@ import yaml
 
 DESIGN_GUIDE = Path(__file__).resolve().parents[3] / "references/design.md"
 REQUIRED = {"paper", "ink", "muted", "accent", "accent_light", "surface", "line",
-            "line_light", "positive", "negative", "chart_series"}
+            "line_light", "code_background", "positive", "negative", "chart_series"}
 
 
 def load() -> dict[str, str | list[str]]:
@@ -31,3 +31,15 @@ def load() -> dict[str, str | list[str]]:
 
 
 COLORS = load()
+
+
+def css_variables() -> str:
+    """Return executable document color variables from the design guide."""
+    aliases = {"paper": "paper", "ink": "ink", "muted": "muted", "accent": "accent",
+               "rule": "line-light", "code-background": "code-background", "soft": "surface",
+               "surface": "surface", "line": "line", "line-light": "line-light",
+               "accent-light": "accent-light"}
+    tokens = " ".join(f"--design-{name.replace('_', '-')}: {value};"
+                      for name, value in COLORS.items() if name != "chart_series")
+    defaults = " ".join(f"--{name}: var(--design-{source});" for name, source in aliases.items())
+    return f":root {{ {tokens} {defaults} }}"

@@ -6,8 +6,10 @@ import os
 import re
 from pathlib import Path
 
+from md_to_pdf.visuals.palette import COLORS
 
-DEFAULT = {"font": "Geist", "accent": "#1c1c1c", "paper": "#ffffff"}
+
+DEFAULT = {"font": "Geist", "accent": COLORS["accent"], "paper": COLORS["paper"]}
 FONTS = {"system-ui", "Geist"}
 FONT_EXTENSIONS = {".ttf", ".otf", ".woff", ".woff2"}
 

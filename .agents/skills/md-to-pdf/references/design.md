@@ -2,7 +2,7 @@
 
 ## Generated visual color tokens
 
-This palette is the source of truth for colors used by generated charts and diagrams. Edit these values here; the renderers load them when building SVG output.
+This palette is the source of truth for colors used by all non-résumé Templates, generated charts, and diagrams. Edit these values here; the build pipeline loads them when building HTML and SVG output. The approved résumé remains visually isolated.
 
 ```yaml
 visual_colors:
@@ -14,6 +14,7 @@ visual_colors:
   surface: "#f2f2f2"
   line: "#999999"
   line_light: "#cccccc"
+  code_background: "#f2f2f2"
   positive: "#555555"
   negative: "#999999"
   chart_series:

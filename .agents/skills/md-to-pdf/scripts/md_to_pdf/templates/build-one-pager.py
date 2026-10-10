@@ -10,6 +10,7 @@ from markdown_it.token import Token
 
 from md_to_pdf.rendering.media_validation import guarded_fetcher, validate_and_rewrite
 from md_to_pdf.rendering.render_html_pdf import _load_weasyprint
+from md_to_pdf.visuals.palette import css_variables
 
 
 CSS = Path(__file__).resolve().parents[3] / "assets/one-pager.css"
@@ -38,7 +39,7 @@ def _description(group: list[Token], markdown: str) -> str:
 
 
 def _styles(profile: dict[str, str] | None) -> str:
-    styles = CSS.read_text(encoding="utf-8")
+    styles = CSS.read_text(encoding="utf-8") + "\n" + css_variables()
     if not profile:
         return styles
     font = profile["font"]

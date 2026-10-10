@@ -1,9 +1,9 @@
 :root {
-  --paper: #ffffff;
-  --ink: #1d1d1b;
-  --muted: #66645f;
-  --soft: #f1f1f1;
-  --accent: #383733;
+  --paper: var(--design-paper);
+  --ink: var(--design-ink);
+  --muted: var(--design-muted);
+  --soft: var(--design-surface);
+  --accent: var(--design-accent);
   --font-family: "Geist", Arial, sans-serif;
   --font-size-body: 14px;
   --font-size-title: 23pt;

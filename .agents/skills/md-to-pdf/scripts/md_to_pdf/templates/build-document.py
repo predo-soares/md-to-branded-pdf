@@ -13,6 +13,7 @@ from md_to_pdf.visuals.charts import replace_chart_fences
 from md_to_pdf.visuals.diagrams import replace_diagram_fences
 from md_to_pdf.rendering.media_validation import guarded_fetcher, validate_and_rewrite
 from md_to_pdf.rendering.render_html_pdf import _load_weasyprint
+from md_to_pdf.visuals.palette import css_variables
 
 
 CSS = Path(__file__).resolve().parents[3] / "assets/plain-document.css"
@@ -53,7 +54,7 @@ def build(source: Path, html_output: Path, pdf_output: Path, *, markdown: str | 
                            + "</figure>"),
             body,
         )
-    styles = (css_path or CSS).read_text(encoding="utf-8")
+    styles = (css_path or CSS).read_text(encoding="utf-8") + "\n" + css_variables()
     if style_profile:
         font = style_profile["font"]
         if font == "Geist":

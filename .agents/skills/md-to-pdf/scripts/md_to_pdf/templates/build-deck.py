@@ -12,6 +12,7 @@ from md_to_pdf.content.deck_content import split_slides
 from md_to_pdf.visuals.diagrams import replace_diagram_fences
 from md_to_pdf.rendering.media_validation import guarded_fetcher, validate_and_rewrite
 from md_to_pdf.rendering.render_html_pdf import _load_weasyprint
+from md_to_pdf.visuals.palette import css_variables
 
 
 CSS = Path(__file__).resolve().parents[3] / "assets/deck.css"
@@ -88,7 +89,7 @@ def build(source: Path, html_output: Path, pdf_output: Path, *, markdown: str | 
         content = parser.renderer.render(tokens, parser.options, {})
         rendered.append(f'<section class="slide {layout}" data-slide="{index + 1}" data-layout="{layout}">{content}</section>')
         metadata.append({"number": index + 1, "layout": layout, "title": headings[0]})
-    styles = CSS.read_text(encoding="utf-8")
+    styles = CSS.read_text(encoding="utf-8") + "\n" + css_variables()
     if style_profile:
         font = style_profile["font"]
         if font == "Geist":
