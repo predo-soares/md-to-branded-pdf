@@ -54,7 +54,7 @@ Markdown mapping: `# Name` is the identity; the following bold line is the headl
 
 ## Cover letters
 
-The cover-letter workflow uses `assets/templates/cover-letter.html` as its canonical visual source, saves HTML, and renders that HTML with WeasyPrint. It expects Markdown beginning with `Dear `, body paragraphs, a sign-off, and a signature. Set `CAREER_NAME`, `CAREER_LOCATION`, `CAREER_EMAIL`, `CAREER_WEBSITE`, `CAREER_RECIPIENT`, and `CAREER_SUBJECT` locally; `CAREER_DATE` is optional. Keep personal values out of tracked files. The one-page A4 contract is enforced. The standalone `scripts/render-cover-letter.py` remains a compatibility command and now saves sibling HTML.
+The cover-letter workflow uses `assets/templates/cover-letter.html` as its canonical visual source, saves HTML, and renders that HTML with WeasyPrint. It expects Markdown beginning with `Dear `, body paragraphs, a sign-off, and a signature. Set `CAREER_NAME`, `CAREER_LOCATION`, `CAREER_EMAIL`, `CAREER_WEBSITE`, `CAREER_RECIPIENT`, and `CAREER_SUBJECT` locally; `CAREER_DATE` is optional. Keep personal values out of tracked files. The one-page A4 contract is enforced. Build through the unified `scripts/build.py` command.
 
 ## Dependencies and review
 

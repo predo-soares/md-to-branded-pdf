@@ -10,4 +10,4 @@ The `md_to_pdf/` package contains implementation modules:
 - `fonts/`: font resolution and style profile
 - `rendering/`: WeasyPrint and media helpers
 
-`build-resume.py` and `render-cover-letter.py` remain compatibility commands. Edit their implementations under `md_to_pdf/templates/`.
+The résumé and cover-letter implementations live under `md_to_pdf/templates/` and are reached through `build.py`.
